@@ -1,0 +1,98 @@
+.demo-module-container {
+  max-width: 800px;
+  margin: 3rem auto;
+  padding: 0 1rem;
+}
+
+.module-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 2.5rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+.badge-role {
+  display: inline-block;
+  background: #e0e7ff;
+  color: #4338ca;
+  font-weight: 700;
+  font-size: 0.75rem;
+  padding: 0.25rem 0.65rem;
+  border-radius: 9999px;
+  text-transform: uppercase;
+  margin-bottom: 0.75rem;
+}
+
+.module-card h1 {
+  font-size: 1.75rem;
+  margin: 0 0 0.25rem;
+  color: #0f172a;
+}
+
+.subtitle {
+  color: #64748b;
+  margin: 0 0 1.5rem;
+}
+
+.features-box {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.features-box h3 {
+  margin: 0 0 0.5rem;
+  font-size: 0.95rem;
+  color: #334155;
+}
+
+.features-box ul {
+  margin: 0;
+  padding-left: 1.25rem;
+  color: #475569;
+  font-size: 0.875rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.demo-login-box {
+  border-top: 1px dashed #cbd5e1;
+  padding-top: 1.25rem;
+}
+
+.demo-login-box h3 {
+  margin: 0 0 0.25rem;
+  font-size: 1rem;
+}
+
+.role-btn-group {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1rem;
+  flex-wrap: wrap;
+}
+
+.btn {
+  display: inline-flex;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  border-radius: 6px;
+  text-decoration: none;
+}
+
+.btn-primary {
+  background: #4f46e5;
+  color: #fff;
+}
+
+.btn-outline {
+  background: transparent;
+  border: 1px solid #cbd5e1;
+  color: #475569;
+}
+
