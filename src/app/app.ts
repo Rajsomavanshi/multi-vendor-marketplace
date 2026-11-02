@@ -1,12 +1,20 @@
 import { Component, signal } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { Reports } from './features/admin/reports/reports';
+import { UserManagement } from './features/admin/user-management/user-management';
 
 @Component({
-  imports: [RouterOutlet],
   selector: 'app-root',
-  styleUrl: './app.css',
+  standalone: true,
+  imports: [CommonModule, Reports, UserManagement],
   templateUrl: './app.html',
+  styleUrl: './app.css'
 })
 export class App {
-  protected readonly title = signal('multi-vendor-marketplace');
+  // Navigation tab state - default to 'reports'
+  readonly activeTab = signal<'reports' | 'users'>('reports');
+
+  setTab(tab: 'reports' | 'users'): void {
+    this.activeTab.set(tab);
+  }
 }
