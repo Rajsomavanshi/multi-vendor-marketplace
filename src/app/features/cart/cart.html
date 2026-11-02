@@ -1,1 +1,363 @@
-<p>cart works!</p>
+<div class="cart-container">
+  <!-- Toast Notification -->
+  @if (toastMessage()) {
+    <div class="toast-alert animate-slide-in">
+      <span>{{ toastMessage() }}</span>
+      <button type="button" class="toast-close" (click)="toastMessage.set(null)">×</button>
+    </div>
+  }
+
+  <!-- Module Header -->
+  <div class="page-header">
+    <div>
+      <span class="role-badge">Student 3 Deliverable</span>
+      <h1 class="page-title">Shopping Cart</h1>
+      <p class="page-subtitle">
+        Review your multi-vendor items, update quantities, apply coupon codes, and proceed to checkout.
+      </p>
+    </div>
+    <div class="header-actions">
+      @if (cartService.cartItems().length > 0) {
+        <button type="button" class="btn btn-outline-danger" (click)="clearAll()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="3 6 5 6 21 6"></polyline>
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+          </svg>
+          Clear Cart
+        </button>
+      }
+      <button type="button" class="btn btn-outline-primary" (click)="loadSampleCart()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+          <polyline points="7 10 12 15 17 10"></polyline>
+          <line x1="12" y1="15" x2="12" y2="3"></line>
+        </svg>
+        Reset Demo Items
+      </button>
+    </div>
+  </div>
+
+  @if (cartService.cartItems().length === 0) {
+    <!-- Empty Cart State -->
+    <div class="empty-state-card">
+      <div class="empty-icon-wrap">
+        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="1.5">
+          <circle cx="9" cy="21" r="1"></circle>
+          <circle cx="20" cy="21" r="1"></circle>
+          <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+        </svg>
+      </div>
+      <h2>Your shopping cart is empty</h2>
+      <p>Looks like you haven't added anything to your cart yet. Explore our curated multi-vendor marketplace!</p>
+      <div class="empty-actions">
+        <a routerLink="/products" class="btn btn-primary">Browse Catalogue</a>
+        <button type="button" class="btn btn-secondary" (click)="loadSampleCart()">Load Demo Items</button>
+        <a routerLink="/wishlist" class="btn btn-outline">Check Wishlist ({{ cartService.wishlistCount() }})</a>
+      </div>
+    </div>
+  } @else {
+    <!-- Free Delivery Progress Bar -->
+    <div class="delivery-threshold-card">
+      <div class="delivery-info">
+        @if (cartService.isFreeDeliveryEligible()) {
+          <div class="threshold-status success">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+              <polyline points="22 4 12 14.01 9 11.01"></polyline>
+            </svg>
+            <span><strong>Congratulations!</strong> You have qualified for <strong>FREE Standard Delivery</strong>!</span>
+          </div>
+        } @else {
+          <div class="threshold-status pending">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="1" y="3" width="15" height="13"></rect>
+              <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon>
+              <circle cx="5.5" cy="18.5" r="2.5"></circle>
+              <circle cx="18.5" cy="18.5" r="2.5"></circle>
+            </svg>
+            <span>
+              Add <strong>₹{{ cartService.amountNeededForFreeDelivery() }}</strong> more to your cart to get <strong>FREE Standard Delivery</strong>!
+            </span>
+          </div>
+        }
+      </div>
+      <div class="progress-bar-container">
+        <div class="progress-fill" [style.width.%]="cartService.freeDeliveryProgress()"></div>
+      </div>
+    </div>
+
+    <!-- Main Cart Content Grid -->
+    <div class="cart-layout-grid">
+      <!-- Left Column: Items grouped by Seller -->
+      <div class="cart-items-column">
+        <div class="cart-items-header">
+          <span>Items in Cart ({{ cartService.itemCount() }} units)</span>
+          <span class="subtext">Multi-Vendor Verified Sellers</span>
+        </div>
+
+        @for (group of groupedBySeller(); track group.sellerId) {
+          <div class="seller-group-card">
+            <div class="seller-header">
+              <div class="seller-meta">
+                <span class="seller-store-icon">🏪</span>
+                <span class="seller-name">Sold by: <strong>{{ group.sellerName }}</strong></span>
+                <span class="seller-rating">★ {{ group.sellerRating }}</span>
+              </div>
+              <span class="seller-item-count">{{ group.items.length }} {{ group.items.length === 1 ? 'item' : 'items' }}</span>
+            </div>
+
+            <div class="seller-items-list">
+              @for (item of group.items; track item.product.id) {
+                <div class="cart-item-row">
+                  <!-- Product Image -->
+                  <div class="item-img-wrapper">
+                    <img [src]="item.product.imageUrl" [alt]="item.product.name" loading="lazy" />
+                  </div>
+
+                  <!-- Product Details -->
+                  <div class="item-details">
+                    <span class="category-tag">{{ item.product.category }}</span>
+                    <h3 class="item-name">{{ item.product.name }}</h3>
+                    <p class="item-desc">{{ item.product.description }}</p>
+
+                    <div class="item-pricing-mobile">
+                      <span class="current-price">₹{{ item.product.price | number }}</span>
+                      @if (item.product.originalPrice) {
+                        <span class="original-price">₹{{ item.product.originalPrice | number }}</span>
+                      }
+                    </div>
+
+                    <!-- Quantity Stepper & Stock -->
+                    <div class="item-actions-row">
+                      <div class="qty-stepper">
+                        <button
+                          type="button"
+                          class="qty-btn"
+                          (click)="decrement(item.product.id)"
+                          [title]="item.quantity === 1 ? 'Remove item' : 'Decrease quantity'"
+                          aria-label="Decrease quantity"
+                        >
+                          −
+                        </button>
+                        <input
+                          type="number"
+                          class="qty-input"
+                          [value]="item.quantity"
+                          (change)="onQuantityChange(item.product.id, $event)"
+                          min="1"
+                          [max]="item.product.stockCount"
+                          aria-label="Quantity"
+                        />
+                        <button
+                          type="button"
+                          class="qty-btn"
+                          (click)="increment(item.product.id)"
+                          [disabled]="item.quantity >= item.product.stockCount"
+                          title="Increase quantity"
+                          aria-label="Increase quantity"
+                        >
+                          +
+                        </button>
+                      </div>
+
+                      <span class="stock-badge" [class.low-stock]="item.product.stockCount <= 10">
+                        {{ item.product.stockCount }} in stock
+                      </span>
+
+                      <!-- Item Action Buttons -->
+                      <button
+                        type="button"
+                        class="action-link move-wishlist-btn"
+                        (click)="moveToWishlist(item.product.id, item.product.name)"
+                        title="Move this product to your wishlist"
+                      >
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                        </svg>
+                        Move to Wishlist
+                      </button>
+
+                      <button
+                        type="button"
+                        class="action-link remove-btn"
+                        (click)="removeItem(item.product.id, item.product.name)"
+                        title="Remove product from cart"
+                      >
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <polyline points="3 6 5 6 21 6"></polyline>
+                          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                        </svg>
+                        Remove
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Unit Price & Line Total Desktop -->
+                  <div class="item-line-total">
+                    <span class="unit-price-label">Unit: ₹{{ item.product.price | number }}</span>
+                    <span class="total-price-value">₹{{ item.product.price * item.quantity | number }}</span>
+                    @if (item.quantity > 1) {
+                      <span class="qty-formula">({{ item.quantity }} × ₹{{ item.product.price | number }})</span>
+                    }
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        }
+
+        <!-- Bottom Continue Shopping banner -->
+        <div class="continue-shopping-bar">
+          <a routerLink="/products" class="btn btn-outline">
+            ← Continue Shopping
+          </a>
+          <a routerLink="/wishlist" class="btn btn-outline">
+            View Wishlist ({{ cartService.wishlistCount() }}) →
+          </a>
+        </div>
+      </div>
+
+      <!-- Right Column: Order Summary & Checkout -->
+      <div class="cart-summary-column">
+        <div class="summary-card">
+          <h2 class="summary-title">Order Summary</h2>
+
+          <!-- Shipping Speed Selector in Cart -->
+          <div class="shipping-method-selector">
+            <label class="section-label">Select Delivery Option:</label>
+            @for (opt of cartService.shippingOptions; track opt.id) {
+              <div
+                class="shipping-radio-item"
+                [class.selected]="cartService.selectedShippingOption().id === opt.id"
+                (click)="cartService.setShippingOption(opt)"
+              >
+                <div class="radio-indicator">
+                  <span class="dot"></span>
+                </div>
+                <div class="opt-details">
+                  <div class="opt-header">
+                    <span class="opt-name">{{ opt.name }}</span>
+                    <span class="opt-cost">
+                      @if (opt.id === 'ship-std' && cartService.isFreeDeliveryEligible()) {
+                        <span class="badge-free">FREE</span>
+                      } @else {
+                        ₹{{ opt.cost }}
+                      }
+                    </span>
+                  </div>
+                  <span class="opt-desc">{{ opt.estimatedDays }}</span>
+                </div>
+              </div>
+            }
+          </div>
+
+          <!-- Coupon / Promo Code Input -->
+          <div class="promo-section">
+            <label class="section-label" for="promoInput">Apply Coupon Code:</label>
+            <div class="promo-input-group">
+              <input
+                id="promoInput"
+                type="text"
+                placeholder="Enter coupon (e.g. WELCOME10)"
+                [value]="promoCodeInput()"
+                (input)="promoCodeInput.set($any($event.target).value)"
+                class="promo-field"
+              />
+              <button type="button" class="btn btn-apply" (click)="applyPromo()">Apply</button>
+            </div>
+
+            <!-- Demo Coupon Hints -->
+            <div class="demo-coupon-chips">
+              <span class="coupon-hint-label">Try quick codes:</span>
+              <button type="button" class="coupon-chip" (click)="promoCodeInput.set('WELCOME10'); applyPromo()">WELCOME10</button>
+              <button type="button" class="coupon-chip" (click)="promoCodeInput.set('FLAT200'); applyPromo()">FLAT200</button>
+              <button type="button" class="coupon-chip" (click)="promoCodeInput.set('FREESHIP'); applyPromo()">FREESHIP</button>
+            </div>
+
+            @if (cartService.appliedPromoCode()) {
+              <div class="applied-promo-pill">
+                <span>Code <strong>{{ cartService.appliedPromoCode()?.code }}</strong> Applied ({{ cartService.appliedPromoCode()?.description }})</span>
+                <button type="button" class="remove-coupon-btn" (click)="removePromo()" title="Remove coupon">×</button>
+              </div>
+            }
+
+            @if (promoFeedback()) {
+              <p class="promo-msg" [class.success]="promoFeedback()?.success" [class.error]="!promoFeedback()?.success">
+                {{ promoFeedback()?.message }}
+              </p>
+            }
+          </div>
+
+          <!-- Price Breakdown Calculations -->
+          <div class="summary-breakdown">
+            <div class="summary-row">
+              <span class="label">Subtotal ({{ cartService.itemCount() }} items):</span>
+              <span class="value">₹{{ cartService.subtotal() | number }}</span>
+            </div>
+
+            <div class="summary-row">
+              <span class="label">Estimated Delivery Charge:</span>
+              <span class="value" [class.text-free]="cartService.deliveryCharge() === 0">
+                @if (cartService.deliveryCharge() === 0) {
+                  FREE
+                } @else {
+                  ₹{{ cartService.deliveryCharge() | number }}
+                }
+              </span>
+            </div>
+
+            @if (cartService.discountAmount() > 0) {
+              <div class="summary-row discount-row">
+                <span class="label">Promo Discount ({{ cartService.appliedPromoCode()?.code }}):</span>
+                <span class="value discount-value">- ₹{{ cartService.discountAmount() | number }}</span>
+              </div>
+            }
+
+            <div class="summary-row">
+              <span class="label">Estimated Tax (5% GST):</span>
+              <span class="value">₹{{ cartService.estimatedTax() | number }}</span>
+            </div>
+
+            <div class="summary-divider"></div>
+
+            <div class="summary-row grand-total-row">
+              <span class="label">Total Amount:</span>
+              <span class="value total-amount">₹{{ cartService.grandTotal() | number }}</span>
+            </div>
+            <span class="tax-inclusive-note">Includes all applicable seller taxes and fees</span>
+          </div>
+
+          <!-- Checkout CTA Button -->
+          <button
+            type="button"
+            class="btn btn-checkout"
+            (click)="proceedToCheckout()"
+          >
+            <span>Proceed to Checkout</span>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </button>
+
+          <!-- Security Assurance Trust Badges -->
+          <div class="trust-badges">
+            <div class="badge-item">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+              </svg>
+              <span>Bank Grade 256-bit SSL Security</span>
+            </div>
+            <div class="badge-item">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                <polyline points="9 22 9 12 15 12 15 22"></polyline>
+              </svg>
+              <span>Multi-Vendor Quality Guarantee</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+</div>

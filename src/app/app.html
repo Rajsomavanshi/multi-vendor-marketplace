@@ -1,1 +1,50 @@
-<router-outlet></router-outlet>
+<div class="app-shell">
+  <app-navbar></app-navbar>
+
+  <main class="app-main">
+    <router-outlet></router-outlet>
+  </main>
+
+  <footer class="app-footer">
+    <div class="footer-container">
+      <div class="footer-col">
+        <div class="footer-brand">
+          <span class="logo-text">ShopNest</span>
+          <span class="badge-tag">Group 1 Integrated Project</span>
+        </div>
+
+        <p class="footer-text">
+          A full-featured Angular Multi-Vendor E-Commerce Marketplace built
+          with collaborative modular architecture.
+        </p>
+      </div>
+
+      <div class="footer-col roles-col">
+        <h4 class="col-title">Project Responsibilities</h4>
+        <ul class="roles-list">
+          <li><strong>Student 1:</strong> User Authentication &amp; Profile Management</li>
+          <li><strong>Student 2:</strong> Product Catalogue &amp; Search</li>
+          <li><strong>Student 3:</strong> Cart, Wishlist &amp; Checkout</li>
+          <li><strong>Student 4:</strong> Seller Dashboard &amp; Inventory</li>
+          <li><strong>Student 5:</strong> Admin Dashboard, Reports &amp; Integration</li>
+        </ul>
+      </div>
+
+      <div class="footer-col quick-col">
+        <h4 class="col-title">Student 3 Features</h4>
+        <ul class="features-list">
+          <li>Multi-vendor Cart with item removal &amp; quantity limits</li>
+          <li>Persistent Wishlist with 1-click move to cart</li>
+          <li>Dynamic Subtotal, Delivery Fee &amp; 5% GST calculations</li>
+          <li>Free delivery threshold progress meter (₹999+)</li>
+          <li>Promo coupons: WELCOME10, FLAT200, FREESHIP</li>
+          <li>Multi-step Mock Checkout &amp; Order Confirmation Receipt</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <p>© {{ currentYear }} ShopNest Multi-Vendor Marketplace</p>
+    </div>
+  </footer>
+</div>

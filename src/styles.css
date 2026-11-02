@@ -12,10 +12,13 @@
   --border-subtle: rgba(255, 255, 255, 0.12);
 }
 
-* {
+/* Global Styles */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
   margin: 0;
   padding: 0;
-  box-sizing: border-box;
 }
 
 html,
@@ -28,6 +31,10 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+body {
+  line-height: 1.5;
+}
+
 button,
 input,
 select,
@@ -38,4 +45,39 @@ textarea {
 a {
   text-decoration: none;
   color: inherit;
+}
+
+/* Animations */
+@keyframes slideIn {
+  from {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-in {
+  animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes shake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+
+  20%, 60% {
+    transform: translateX(-6px);
+  }
+
+  40%, 80% {
+    transform: translateX(6px);
+  }
+}
+
+.animate-shake {
+  animation: shake 0.4s ease-in-out;
 }

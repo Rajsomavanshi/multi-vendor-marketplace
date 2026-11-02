@@ -1,0 +1,65 @@
+
+/* Cart and Wishlist Quick Banner */
+.demo-quick-banner {
+  background: #eef2ff;
+  border: 1px solid #c7d2fe;
+  border-radius: 10px;
+  padding: 12px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.banner-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.9rem;
+  color: #312e81;
+}
+
+.banner-left .tag {
+  background: #4338ca;
+  color: #ffffff;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 4px 8px;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+
+.banner-right {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* Toast Close Button */
+.toast-notification button {
+  background: transparent;
+  border: none;
+  color: #cbd5e1;
+  font-size: 1.25rem;
+  cursor: pointer;
+  padding: 0 2px;
+}
+
+.toast-notification button:hover {
+  color: #ffffff;
+}
+
+/* Responsive Cart Banner */
+@media (max-width: 640px) {
+  .demo-quick-banner {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .banner-left {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}

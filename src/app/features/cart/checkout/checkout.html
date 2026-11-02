@@ -1,0 +1,512 @@
+<div class="checkout-container">
+  <!-- Header -->
+  <div class="page-header">
+    <div>
+      <span class="role-badge">Student 3 Deliverable</span>
+      <h1 class="page-title">Secure Checkout</h1>
+      <p class="page-subtitle">Provide your delivery details, select shipping speed, and complete mock payment.</p>
+    </div>
+    <a routerLink="/cart" class="btn btn-outline">
+      ← Return to Cart
+    </a>
+  </div>
+
+  @if (errorMessage()) {
+    <div class="error-banner animate-shake">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="8" x2="12" y2="12"></line>
+        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+      </svg>
+      <span>{{ errorMessage() }}</span>
+      <button type="button" class="close-btn" (click)="errorMessage.set(null)">×</button>
+    </div>
+  }
+
+  <!-- Stepper Indicator -->
+  <div class="checkout-stepper">
+    <button
+      type="button"
+      class="step-tab"
+      [class.active]="currentStep() === 1"
+      [class.completed]="currentStep() > 1"
+      (click)="setStep(1)"
+    >
+      <span class="step-num">{{ currentStep() > 1 ? '✓' : '1' }}</span>
+      <span class="step-label">Shipping Address</span>
+    </button>
+
+    <div class="step-connector" [class.filled]="currentStep() > 1"></div>
+
+    <button
+      type="button"
+      class="step-tab"
+      [class.active]="currentStep() === 2"
+      [class.completed]="currentStep() > 2"
+      (click)="setStep(2)"
+    >
+      <span class="step-num">{{ currentStep() > 2 ? '✓' : '2' }}</span>
+      <span class="step-label">Delivery Speed</span>
+    </button>
+
+    <div class="step-connector" [class.filled]="currentStep() > 2"></div>
+
+    <button
+      type="button"
+      class="step-tab"
+      [class.active]="currentStep() === 3"
+      (click)="setStep(3)"
+    >
+      <span class="step-num">3</span>
+      <span class="step-label">Payment & Confirmation</span>
+    </button>
+  </div>
+
+  <!-- Checkout Grid -->
+  <div class="checkout-grid">
+    <!-- Left Column: Step Content -->
+    <div class="step-content-column">
+
+      <!-- STEP 1: SHIPPING ADDRESS -->
+      @if (currentStep() === 1) {
+        <div class="step-card">
+          <div class="card-header-row">
+            <div>
+              <h2 class="card-title">1. Shipping & Delivery Address</h2>
+              <p class="card-sub">Where should the multi-vendor sellers dispatch your package?</p>
+            </div>
+            <button type="button" class="btn btn-autofill" (click)="fillDemoAddress()">
+              ⚡ Auto-Fill Demo Address
+            </button>
+          </div>
+
+          <form (ngSubmit)="setStep(2)" #addressForm="ngForm" class="address-form">
+            <div class="form-row two-cols">
+              <div class="form-group">
+                <label for="fullName">Full Name <span class="required">*</span></label>
+                <input
+                  id="fullName"
+                  name="fullName"
+                  type="text"
+                  class="form-control"
+                  [(ngModel)]="address.fullName"
+                  required
+                  placeholder="e.g. Rahul Sharma"
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="email">Email Address <span class="required">*</span></label>
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  class="form-control"
+                  [(ngModel)]="address.email"
+                  required
+                  placeholder="rahul.sharma@example.com"
+                />
+              </div>
+            </div>
+
+            <div class="form-row two-cols">
+              <div class="form-group">
+                <label for="phone">Phone Number <span class="required">*</span></label>
+                <input
+                  id="phone"
+                  name="phone"
+                  type="tel"
+                  class="form-control"
+                  [(ngModel)]="address.phone"
+                  required
+                  placeholder="+91 98765 43210"
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="addressType">Address Type</label>
+                <select id="addressType" name="addressType" class="form-control" [(ngModel)]="address.addressType">
+                  <option value="Home">Home (All Day Delivery)</option>
+                  <option value="Work">Office / Work (10 AM - 6 PM)</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="street">Street Address / House No. / Landmark <span class="required">*</span></label>
+              <textarea
+                id="street"
+                name="street"
+                rows="2"
+                class="form-control"
+                [(ngModel)]="address.street"
+                required
+                placeholder="Flat 402, Green Valley Apartments, MG Road"
+              ></textarea>
+            </div>
+
+            <div class="form-row three-cols">
+              <div class="form-group">
+                <label for="city">City <span class="required">*</span></label>
+                <input
+                  id="city"
+                  name="city"
+                  type="text"
+                  class="form-control"
+                  [(ngModel)]="address.city"
+                  required
+                  placeholder="Bengaluru"
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="state">State <span class="required">*</span></label>
+                <input
+                  id="state"
+                  name="state"
+                  type="text"
+                  class="form-control"
+                  [(ngModel)]="address.state"
+                  required
+                  placeholder="Karnataka"
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="zipCode">Postal PIN / ZIP Code <span class="required">*</span></label>
+                <input
+                  id="zipCode"
+                  name="zipCode"
+                  type="text"
+                  class="form-control"
+                  [(ngModel)]="address.zipCode"
+                  required
+                  placeholder="560001"
+                />
+              </div>
+            </div>
+
+            <div class="form-actions-bar">
+              <a routerLink="/cart" class="btn btn-outline">Back to Cart</a>
+              <button type="submit" class="btn btn-primary" [disabled]="!validateAddress()">
+                Continue to Delivery Speed →
+              </button>
+            </div>
+          </form>
+        </div>
+      }
+
+      <!-- STEP 2: DELIVERY OPTIONS -->
+      @if (currentStep() === 2) {
+        <div class="step-card">
+          <div class="card-header-row">
+            <div>
+              <h2 class="card-title">2. Choose Delivery Speed</h2>
+              <p class="card-sub">Select preferred shipping timeline for all sellers in this order.</p>
+            </div>
+          </div>
+
+          <div class="delivery-options-list">
+            @for (opt of cartService.shippingOptions; track opt.id) {
+              <div
+                class="delivery-card"
+                [class.selected]="cartService.selectedShippingOption().id === opt.id"
+                (click)="onSelectShipping(opt)"
+              >
+                <div class="radio-circle">
+                  <div class="radio-dot"></div>
+                </div>
+                <div class="delivery-details">
+                  <div class="delivery-title-line">
+                    <span class="delivery-name">{{ opt.name }}</span>
+                    <span class="delivery-cost">
+                      @if (opt.id === 'ship-std' && cartService.isFreeDeliveryEligible()) {
+                        <span class="tag-free">FREE</span>
+                      } @else {
+                        ₹{{ opt.cost }}
+                      }
+                    </span>
+                  </div>
+                  <p class="delivery-desc">{{ opt.description }}</p>
+                  <span class="estimated-time">⏱ Estimated Arrival: {{ opt.estimatedDays }}</span>
+                </div>
+              </div>
+            }
+          </div>
+
+          <!-- Address Summary Pill -->
+          <div class="saved-address-preview">
+            <span class="preview-label">Delivering to:</span>
+            <strong>{{ address.fullName }}</strong> ({{ address.addressType }}) —
+            {{ address.street }}, {{ address.city }}, {{ address.state }} - {{ address.zipCode }}
+            <button type="button" class="change-link" (click)="setStep(1)">Edit</button>
+          </div>
+
+          <div class="form-actions-bar">
+            <button type="button" class="btn btn-outline" (click)="setStep(1)">← Back to Address</button>
+            <button type="button" class="btn btn-primary" (click)="setStep(3)">
+              Continue to Payment →
+            </button>
+          </div>
+        </div>
+      }
+
+      <!-- STEP 3: PAYMENT & CONFIRMATION -->
+      @if (currentStep() === 3) {
+        <div class="step-card">
+          <div class="card-header-row">
+            <div>
+              <h2 class="card-title">3. Payment Method</h2>
+              <p class="card-sub">Choose a mock payment method to finalize your test transaction.</p>
+            </div>
+          </div>
+
+          <div class="payment-methods-grid">
+            <!-- Option 1: Card -->
+            <label
+              class="payment-choice-card"
+              [class.active]="selectedPaymentMethod() === 'Credit / Debit Card'"
+            >
+              <input
+                type="radio"
+                name="paymentMethod"
+                [value]="'Credit / Debit Card'"
+                [checked]="selectedPaymentMethod() === 'Credit / Debit Card'"
+                (change)="selectedPaymentMethod.set('Credit / Debit Card')"
+              />
+              <div class="choice-content">
+                <span class="choice-icon">💳</span>
+                <span class="choice-name">Credit / Debit Card</span>
+                <span class="choice-sub">Visa, Mastercard, RuPay</span>
+              </div>
+            </label>
+
+            <!-- Option 2: UPI -->
+            <label
+              class="payment-choice-card"
+              [class.active]="selectedPaymentMethod() === 'UPI / NetBanking'"
+            >
+              <input
+                type="radio"
+                name="paymentMethod"
+                [value]="'UPI / NetBanking'"
+                [checked]="selectedPaymentMethod() === 'UPI / NetBanking'"
+                (change)="selectedPaymentMethod.set('UPI / NetBanking')"
+              />
+              <div class="choice-content">
+                <span class="choice-icon">📱</span>
+                <span class="choice-name">UPI / Net Banking</span>
+                <span class="choice-sub">GPay, PhonePe, Paytm, Banks</span>
+              </div>
+            </label>
+
+            <!-- Option 3: COD -->
+            <label
+              class="payment-choice-card"
+              [class.active]="selectedPaymentMethod() === 'Cash on Delivery'"
+            >
+              <input
+                type="radio"
+                name="paymentMethod"
+                [value]="'Cash on Delivery'"
+                [checked]="selectedPaymentMethod() === 'Cash on Delivery'"
+                (change)="selectedPaymentMethod.set('Cash on Delivery')"
+              />
+              <div class="choice-content">
+                <span class="choice-icon">💵</span>
+                <span class="choice-name">Cash on Delivery</span>
+                <span class="choice-sub">Pay cash or scan on delivery</span>
+              </div>
+            </label>
+          </div>
+
+          <!-- Mock Payment Fields Based on Selected Option -->
+          @if (selectedPaymentMethod() === 'Credit / Debit Card') {
+            <div class="payment-fields-box">
+              <div class="box-header">
+                <span>Card Information (Mock Safe Sandbox)</span>
+                <button type="button" class="btn btn-xs" (click)="fillDemoCard()">Auto-fill Test Card</button>
+              </div>
+
+              <div class="form-group">
+                <label>Card Number</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  placeholder="4532 •••• •••• 8821"
+                  [(ngModel)]="cardDetails.cardNumber"
+                />
+              </div>
+
+              <div class="form-row three-cols">
+                <div class="form-group">
+                  <label>Cardholder Name</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    placeholder="Rahul Sharma"
+                    [(ngModel)]="cardDetails.cardHolder"
+                  />
+                </div>
+                <div class="form-group">
+                  <label>Expiry (MM/YY)</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    placeholder="12/28"
+                    [(ngModel)]="cardDetails.expiry"
+                  />
+                </div>
+                <div class="form-group">
+                  <label>CVV / CVC</label>
+                  <input
+                    type="password"
+                    maxlength="4"
+                    class="form-control"
+                    placeholder="821"
+                    [(ngModel)]="cardDetails.cvv"
+                  />
+                </div>
+              </div>
+            </div>
+          }
+
+          @if (selectedPaymentMethod() === 'UPI / NetBanking') {
+            <div class="payment-fields-box">
+              <div class="box-header">
+                <span>Instant UPI Payment</span>
+              </div>
+              <div class="form-group">
+                <label>Enter Virtual Payment Address (UPI ID)</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  placeholder="e.g. rahul@okaxis or 9876543210@paytm"
+                  [(ngModel)]="upiId"
+                />
+              </div>
+              <div class="upi-apps-icons">
+                <span class="app-tag">Google Pay</span>
+                <span class="app-tag">PhonePe</span>
+                <span class="app-tag">Paytm</span>
+                <span class="app-tag">BHIM UPI</span>
+              </div>
+            </div>
+          }
+
+          @if (selectedPaymentMethod() === 'Cash on Delivery') {
+            <div class="cod-notice-box">
+              <div class="notice-icon">ℹ️</div>
+              <div>
+                <strong>Cash on Delivery (COD) Selected</strong>
+                <p>You can pay via Cash or UPI QR Code directly to the delivery agent upon receiving your order.</p>
+              </div>
+            </div>
+          }
+
+          <!-- Final Review Box -->
+          <div class="final-review-strip">
+            <div>
+              <span class="sub">Total to Pay:</span>
+              <strong class="total-highlight">₹{{ cartService.grandTotal() | number }}</strong>
+            </div>
+            <div>
+              <span class="sub">Shipping via:</span>
+              <strong>{{ cartService.selectedShippingOption().name }}</strong>
+            </div>
+          </div>
+
+          <div class="form-actions-bar">
+            <button type="button" class="btn btn-outline" (click)="setStep(2)" [disabled]="isSubmitting()">
+              ← Back to Delivery
+            </button>
+            <button
+              type="button"
+              class="btn btn-place-order"
+              (click)="onSubmitOrder()"
+              [disabled]="isSubmitting()"
+            >
+              @if (isSubmitting()) {
+                <span class="spinner"></span>
+                <span>Processing Order...</span>
+              } @else {
+                <span>Confirm & Place Order (₹{{ cartService.grandTotal() | number }})</span>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+              }
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+
+    <!-- Right Column: Sticky Order Summary Review -->
+    <div class="checkout-summary-column">
+      <div class="summary-card">
+        <h3 class="summary-title">Order Items ({{ cartService.itemCount() }})</h3>
+
+        <!-- Scrollable mini items list -->
+        <div class="mini-items-list">
+          @for (item of cartService.cartItems(); track item.product.id) {
+            <div class="mini-item-row">
+              <img [src]="item.product.imageUrl" [alt]="item.product.name" class="mini-thumb" />
+              <div class="mini-info">
+                <span class="mini-name">{{ item.product.name }}</span>
+                <span class="mini-seller">Sold by {{ item.product.sellerName }}</span>
+                <span class="mini-qty">Qty: {{ item.quantity }} × ₹{{ item.product.price | number }}</span>
+              </div>
+              <span class="mini-price">₹{{ item.product.price * item.quantity | number }}</span>
+            </div>
+          }
+        </div>
+
+        <div class="summary-divider"></div>
+
+        <!-- Calculations -->
+        <div class="breakdown-list">
+          <div class="row">
+            <span>Subtotal:</span>
+            <span>₹{{ cartService.subtotal() | number }}</span>
+          </div>
+
+          <div class="row">
+            <span>Delivery Fee ({{ cartService.selectedShippingOption().name }}):</span>
+            <span [class.free-text]="cartService.deliveryCharge() === 0">
+              {{ cartService.deliveryCharge() === 0 ? 'FREE' : '₹' + cartService.deliveryCharge() }}
+            </span>
+          </div>
+
+          @if (cartService.discountAmount() > 0) {
+            <div class="row discount-row">
+              <span>Coupon Discount ({{ cartService.appliedPromoCode()?.code }}):</span>
+              <span>- ₹{{ cartService.discountAmount() | number }}</span>
+            </div>
+          }
+
+          <div class="row">
+            <span>Estimated Tax (5% GST):</span>
+            <span>₹{{ cartService.estimatedTax() | number }}</span>
+          </div>
+
+          <div class="summary-divider"></div>
+
+          <div class="row grand-row">
+            <span>Grand Total:</span>
+            <span class="grand-value">₹{{ cartService.grandTotal() | number }}</span>
+          </div>
+        </div>
+
+        <div class="security-note">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+          </svg>
+          <span>Safe 256-bit Mock Encrypted Checkout</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+

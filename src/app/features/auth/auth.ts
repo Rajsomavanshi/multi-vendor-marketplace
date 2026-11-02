@@ -1,5 +1,11 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
+import {
+  FormBuilder,
+  ReactiveFormsModule,
+  Validators,
+  AbstractControl,
+  ValidationErrors
+} from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgClass } from '@angular/common';
 import { AuthService, UserRole } from '../../services/auth';
@@ -14,6 +20,7 @@ function passwordMatchValidator(control: AbstractControl): ValidationErrors | nu
     confirmPassword.setErrors({ passwordMismatch: true });
     return { passwordMismatch: true };
   }
+
   return null;
 }
 
@@ -65,9 +72,9 @@ export class Auth implements OnInit {
   );
 
   ngOnInit(): void {
-    // Check if user is already logged in
     if (this.auth.isLoggedIn()) {
       const user = this.auth.getCurrentUser();
+
       if (user?.role === 'admin') {
         this.router.navigate(['/admin']);
       } else if (user?.role === 'seller') {
@@ -75,16 +82,17 @@ export class Auth implements OnInit {
       } else {
         this.router.navigate(['/profile']);
       }
+
       return;
     }
 
-    // Capture tab or returnUrl from query params
     this.route.queryParams.subscribe(params => {
       if (params['mode'] === 'register') {
         this.activeTab = 'register';
       } else if (params['mode'] === 'login') {
         this.activeTab = 'login';
       }
+
       if (params['returnUrl']) {
         this.returnUrl = params['returnUrl'];
       }
@@ -99,6 +107,7 @@ export class Auth implements OnInit {
 
   fillDemo(role: 'admin' | 'seller' | 'customer'): void {
     this.activeTab = 'login';
+
     const credentials = {
       admin: { email: 'admin@gmail.com', pass: 'admin123' },
       seller: { email: 'seller@gmail.com', pass: 'seller123' },
@@ -128,10 +137,13 @@ export class Auth implements OnInit {
 
   getPasswordStrength(): { score: number; label: string; colorClass: string } {
     const password = this.registerForm.get('password')?.value || '';
+
     if (!password) {
       return { score: 0, label: 'None', colorClass: 'strength-none' };
     }
+
     let score = 0;
+
     if (password.length >= 6) score++;
     if (password.length >= 8) score++;
     if (/[A-Z]/.test(password) && /[a-z]/.test(password)) score++;
@@ -172,12 +184,19 @@ export class Auth implements OnInit {
         this.loginMessage = 'Authentication successful! Redirecting...';
 
         const user = this.auth.getCurrentUser();
-        let targetRoute = this.returnUrl && this.returnUrl !== '/login' ? this.returnUrl : '/profile';
+        let targetRoute =
+          this.returnUrl && this.returnUrl !== '/login'
+            ? this.returnUrl
+            : '/profile';
 
         if (targetRoute === '/profile' && user) {
-          if (user.role === 'admin') targetRoute = '/admin';
-          else if (user.role === 'seller') targetRoute = '/seller';
-          else targetRoute = '/customer';
+          if (user.role === 'admin') {
+            targetRoute = '/admin';
+          } else if (user.role === 'seller') {
+            targetRoute = '/seller';
+          } else {
+            targetRoute = '/customer';
+          }
         }
 
         setTimeout(() => {
@@ -185,7 +204,8 @@ export class Auth implements OnInit {
         }, 600);
       } else {
         this.loginMessageType = 'error';
-        this.loginMessage = 'Invalid email or password. Please verify your credentials.';
+        this.loginMessage =
+          'Invalid email or password. Please verify your credentials.';
       }
     }, 400);
   }
@@ -214,20 +234,25 @@ export class Auth implements OnInit {
 
       if (success) {
         this.registerMessageType = 'success';
-        this.registerMessage = 'Account created successfully! Switching to sign in...';
+        this.registerMessage =
+          'Account created successfully! Switching to sign in...';
 
         setTimeout(() => {
           this.activeTab = 'login';
+
           this.loginForm.patchValue({
             email: raw.email!.trim(),
             password: raw.password!
           });
-          this.loginMessage = 'Account ready. Click Sign In to access your dashboard!';
+
+          this.loginMessage =
+            'Account ready. Click Sign In to access your dashboard!';
           this.loginMessageType = 'success';
         }, 1200);
       } else {
         this.registerMessageType = 'error';
-        this.registerMessage = 'This email address is already registered. Please sign in or use another email.';
+        this.registerMessage =
+          'This email address is already registered. Please sign in or use another email.';
       }
     }, 500);
   }
