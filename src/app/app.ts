@@ -1,20 +1,16 @@
-import { Component, signal } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Reports } from './features/admin/reports/reports';
-import { UserManagement } from './features/admin/user-management/user-management';
+import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
+import { ProductService } from './features/products/services/product.service';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, Reports, UserManagement],
+  imports: [CommonModule, RouterOutlet, RouterLink, RouterLinkActive],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
 export class App {
-  // Navigation tab state - default to 'reports'
-  readonly activeTab = signal<'reports' | 'users'>('reports');
-
-  setTab(tab: 'reports' | 'users'): void {
-    this.activeTab.set(tab);
-  }
+  protected readonly productService = inject(ProductService);
+  protected readonly currentYear = new Date().getFullYear();
 }
