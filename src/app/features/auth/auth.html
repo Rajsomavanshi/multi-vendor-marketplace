@@ -1,24 +1,470 @@
-<div class="demo-module-container">
-  <div class="module-card">
-    <div class="badge-role">Student 1 Module</div>
-    <h1>User Authentication & Profile Management</h1>
-    <p class="subtitle">Assigned to: Student 1</p>
-    <div class="features-box">
-      <h3>Deliverables Checklist:</h3>
-      <ul>
-        <li>✓ Create login, registration, logout, and profile screens</li>
-        <li>✓ Add form validation for required fields, email, and password</li>
-        <li>✓ Create a role-aware navigation experience for customer, seller, and administrator demo roles</li>
-      </ul>
-    </div>
-    <div class="demo-login-box">
-      <h3>Quick Switch Demo Role</h3>
-      <p>Currently interacting as: <strong>Customer (Student 3 Shopping flow active)</strong></p>
-      <div class="role-btn-group">
-        <a routerLink="/products" class="btn btn-primary">Customer View (Shop & Cart)</a>
-        <a routerLink="/seller" class="btn btn-outline">Seller View</a>
-        <a routerLink="/admin" class="btn btn-outline">Admin View</a>
+
+<div class="auth-page-wrapper">
+  <!-- Decorative background elements -->
+  <div class="bg-orb orb-1"></div>
+  <div class="bg-orb orb-2"></div>
+  <div class="bg-orb orb-3"></div>
+
+  <div class="auth-card-container">
+    <!-- Brand Header -->
+    <div class="brand-header">
+      <div class="brand-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/>
+          <path d="M3 6h18"/>
+          <path d="M16 10a4 4 0 0 1-8 0"/>
+        </svg>
       </div>
+      <h1 class="brand-title">MarketPulse</h1>
+      <p class="brand-badge">Global Multi-Vendor Marketplace</p>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div class="auth-tabs" role="tablist">
+      <button 
+        type="button" 
+        class="tab-btn" 
+        [class.active]="activeTab === 'login'" 
+        (click)="setTab('login')"
+        role="tab"
+        [attr.aria-selected]="activeTab === 'login'">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="tab-icon">
+          <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
+          <polyline points="10 17 15 12 10 7"/>
+          <line x1="15" y1="12" x2="3" y2="12"/>
+        </svg>
+        Sign In
+      </button>
+
+      <button 
+        type="button" 
+        class="tab-btn" 
+        [class.active]="activeTab === 'register'" 
+        (click)="setTab('register')"
+        role="tab"
+        [attr.aria-selected]="activeTab === 'register'">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="tab-icon">
+          <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+          <circle cx="9" cy="7" r="4"/>
+          <line x1="19" y1="8" x2="19" y2="14"/>
+          <line x1="22" y1="11" x2="16" y2="11"/>
+        </svg>
+        Create Account
+      </button>
+    </div>
+
+    <!-- Quick Demo Accounts Toolbar -->
+    <div class="demo-strip">
+      <span class="demo-label">Quick Test:</span>
+      <div class="demo-pills">
+        <button type="button" class="demo-chip chip-admin" (click)="fillDemo('admin')" title="Fill Admin credentials">
+          <span class="chip-dot"></span> Admin
+        </button>
+        <button type="button" class="demo-chip chip-seller" (click)="fillDemo('seller')" title="Fill Seller credentials">
+          <span class="chip-dot"></span> Seller
+        </button>
+        <button type="button" class="demo-chip chip-customer" (click)="fillDemo('customer')" title="Fill Customer credentials">
+          <span class="chip-dot"></span> Customer
+        </button>
+      </div>
+    </div>
+
+    <!-- TAB 1: LOGIN FORM -->
+    @if (activeTab === 'login') {
+      <div class="tab-content" id="login-panel">
+        <div class="form-intro">
+          <h2>Welcome Back</h2>
+          <p class="subtitle">Access your multi-vendor portal, orders, and products</p>
+        </div>
+
+        @if (loginMessage) {
+          <div class="alert-banner" [class.alert-success]="loginMessageType === 'success'" [class.alert-error]="loginMessageType === 'error'">
+            <span class="alert-icon">
+              @if (loginMessageType === 'success') { ✓ } @else { ⚠ }
+            </span>
+            <span class="alert-text">{{ loginMessage }}</span>
+          </div>
+        }
+
+        <form [formGroup]="loginForm" (ngSubmit)="onLoginSubmit()" novalidate>
+          <!-- Email field -->
+          <div class="input-group" [class.has-error]="loginForm.controls.email.touched && loginForm.controls.email.invalid">
+            <label for="login-email">Email Address</label>
+            <div class="input-wrapper">
+              <svg class="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect width="20" height="16" x="2" y="4" rx="2"/>
+                <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
+              </svg>
+              <input 
+                id="login-email"
+                type="email" 
+                formControlName="email" 
+                placeholder="name@marketplace.com" 
+                autocomplete="email" />
+            </div>
+            @if (loginForm.controls.email.touched && loginForm.controls.email.invalid) {
+              <span class="error-msg">
+                @if (loginForm.controls.email.errors?.['required']) {
+                  Email is required.
+                } @else if (loginForm.controls.email.errors?.['email']) {
+                  Please enter a valid email address.
+                }
+              </span>
+            }
+          </div>
+
+          <!-- Password field -->
+          <div class="input-group" [class.has-error]="loginForm.controls.password.touched && loginForm.controls.password.invalid">
+            <div class="label-row">
+              <label for="login-password">Password</label>
+              <a href="javascript:void(0)" class="forgot-link" (click)="loginMessage = 'Use demo accounts (admin123, seller123, customer123) for testing'; loginMessageType = 'success'">Forgot?</a>
+            </div>
+            <div class="input-wrapper">
+              <svg class="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect width="18" height="11" x="3" y="11" rx="2" ry="2"/>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+              </svg>
+              <input 
+                id="login-password"
+                [type]="showLoginPassword ? 'text' : 'password'" 
+                formControlName="password" 
+                placeholder="Enter password" 
+                autocomplete="current-password" />
+              <button 
+                type="button" 
+                class="toggle-pwd-btn" 
+                (click)="toggleLoginPassword()" 
+                [attr.aria-label]="showLoginPassword ? 'Hide password' : 'Show password'">
+                @if (showLoginPassword) {
+                  <!-- Eye Off -->
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/>
+                    <path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/>
+                    <path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/>
+                    <line x1="2" y1="2" x2="22" y2="22"/>
+                  </svg>
+                } @else {
+                  <!-- Eye Open -->
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/>
+                    <circle cx="12" cy="12" r="3"/>
+                  </svg>
+                }
+              </button>
+            </div>
+            @if (loginForm.controls.password.touched && loginForm.controls.password.invalid) {
+              <span class="error-msg">Password is required (minimum 6 characters).</span>
+            }
+          </div>
+
+          <!-- Remember me & Actions -->
+          <div class="form-row-remember">
+            <label class="checkbox-label">
+              <input type="checkbox" formControlName="rememberMe" />
+              <span class="custom-checkbox"></span>
+              Keep me signed in
+            </label>
+          </div>
+
+          <!-- Submit Button -->
+          <button type="submit" class="primary-btn" [disabled]="isLoginSubmitting">
+            @if (isLoginSubmitting) {
+              <span class="spinner"></span>
+              Authenticating...
+            } @else {
+              <span>Sign In to Account</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="btn-arrow">
+                <line x1="5" y1="12" x2="19" y2="12"/>
+                <polyline points="12 5 19 12 12 19"/>
+              </svg>
+            }
+          </button>
+        </form>
+
+        <div class="card-footer">
+          <span>New to MarketPulse?</span>
+          <button type="button" class="text-link-btn" (click)="setTab('register')">Create an account</button>
+        </div>
+      </div>
+    }
+
+    <!-- TAB 2: REGISTER FORM -->
+    @if (activeTab === 'register') {
+      <div class="tab-content" id="register-panel">
+        <div class="form-intro">
+          <h2>Create Your Account</h2>
+          <p class="subtitle">Join as a verified buyer or open your vendor storefront</p>
+        </div>
+
+        @if (registerMessage) {
+          <div class="alert-banner" [class.alert-success]="registerMessageType === 'success'" [class.alert-error]="registerMessageType === 'error'">
+            <span class="alert-icon">
+              @if (registerMessageType === 'success') { ✓ } @else { ⚠ }
+            </span>
+            <span class="alert-text">{{ registerMessage }}</span>
+          </div>
+        }
+
+        <form [formGroup]="registerForm" (ngSubmit)="onRegisterSubmit()" novalidate>
+          <!-- Role Selector Radio Cards -->
+          <div class="role-selector-container">
+            <label class="field-caption">Choose Account Type</label>
+            <div class="role-cards-grid">
+              <label class="role-option" [class.selected]="registerForm.get('role')?.value === 'customer'">
+                <input type="radio" formControlName="role" value="customer" />
+                <div class="role-card-inner">
+                  <div class="role-icon-box customer-color">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <circle cx="8" cy="21" r="1"/>
+                      <circle cx="19" cy="21" r="1"/>
+                      <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/>
+                    </svg>
+                  </div>
+                  <div class="role-info">
+                    <strong>Customer</strong>
+                    <p>Shop products & track orders</p>
+                  </div>
+                </div>
+              </label>
+
+              <label class="role-option" [class.selected]="registerForm.get('role')?.value === 'seller'">
+                <input type="radio" formControlName="role" value="seller" />
+                <div class="role-card-inner">
+                  <div class="role-icon-box seller-color">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="m2 7 4.41-4.41A2 2 0 0 1 7.83 2h8.34a2 2 0 0 1 1.42.59L22 7"/>
+                      <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
+                      <path d="M15 22v-4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4"/>
+                      <path d="M2 7h20"/>
+                    </svg>
+                  </div>
+                  <div class="role-info">
+                    <strong>Seller</strong>
+                    <p>Sell goods & run storefront</p>
+                  </div>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <!-- Full Name -->
+          <div class="input-group" [class.has-error]="registerForm.controls.name.touched && registerForm.controls.name.invalid">
+            <label for="reg-name">Full Name</label>
+            <div class="input-wrapper">
+              <svg class="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/>
+                <circle cx="12" cy="7" r="4"/>
+              </svg>
+              <input 
+                id="reg-name"
+                type="text" 
+                formControlName="name" 
+                placeholder="e.g. John Doe" 
+                autocomplete="name" />
+            </div>
+            @if (registerForm.controls.name.touched && registerForm.controls.name.invalid) {
+              <span class="error-msg">Please enter your full name (minimum 2 characters).</span>
+            }
+          </div>
+
+          <!-- Conditional Store Name for Sellers -->
+          @if (registerForm.get('role')?.value === 'seller') {
+            <div class="input-group animated-fade-in">
+              <label for="reg-store">Store / Business Name</label>
+              <div class="input-wrapper">
+                <svg class="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                  <polyline points="9 22 9 12 15 12 15 22"/>
+                </svg>
+                <input 
+                  id="reg-store"
+                  type="text" 
+                  formControlName="storeName" 
+                  placeholder="e.g. Apex Electronics & Fashion" />
+              </div>
+            </div>
+          }
+
+          <!-- Email -->
+          <div class="input-group" [class.has-error]="registerForm.controls.email.touched && registerForm.controls.email.invalid">
+            <label for="reg-email">Email Address</label>
+            <div class="input-wrapper">
+              <svg class="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect width="20" height="16" x="2" y="4" rx="2"/>
+                <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
+              </svg>
+              <input 
+                id="reg-email"
+                type="email" 
+                formControlName="email" 
+                placeholder="name@marketplace.com" 
+                autocomplete="email" />
+            </div>
+            @if (registerForm.controls.email.touched && registerForm.controls.email.invalid) {
+              <span class="error-msg">
+                @if (registerForm.controls.email.errors?.['required']) {
+                  Email is required.
+                } @else if (registerForm.controls.email.errors?.['email']) {
+                  Please enter a valid email address.
+                }
+              </span>
+            }
+          </div>
+
+          <!-- Password with Strength Meter -->
+          <div class="input-group" [class.has-error]="registerForm.controls.password.touched && registerForm.controls.password.invalid">
+            <label for="reg-password">Password</label>
+            <div class="input-wrapper">
+              <svg class="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect width="18" height="11" x="3" y="11" rx="2" ry="2"/>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+              </svg>
+              <input 
+                id="reg-password"
+                [type]="showRegisterPassword ? 'text' : 'password'" 
+                formControlName="password" 
+                placeholder="At least 6 characters" 
+                autocomplete="new-password" />
+              <button 
+                type="button" 
+                class="toggle-pwd-btn" 
+                (click)="toggleRegisterPassword()" 
+                [attr.aria-label]="showRegisterPassword ? 'Hide password' : 'Show password'">
+                @if (showRegisterPassword) {
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/>
+                    <path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/>
+                    <path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/>
+                    <line x1="2" y1="2" x2="22" y2="22"/>
+                  </svg>
+                } @else {
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/>
+                    <circle cx="12" cy="12" r="3"/>
+                  </svg>
+                }
+              </button>
+            </div>
+
+            <!-- Password strength indicator bar -->
+            @if (registerForm.get('password')?.value) {
+              <div class="strength-meter">
+                <div class="meter-bar">
+                  <div class="meter-fill" [style.width.%]="getPasswordStrength().score" [ngClass]="getPasswordStrength().colorClass"></div>
+                </div>
+                <div class="strength-text">
+                  <span>Strength: <strong>{{ getPasswordStrength().label }}</strong></span>
+                  <span class="hint">Min 6 characters</span>
+                </div>
+              </div>
+            }
+
+            @if (registerForm.controls.password.touched && registerForm.controls.password.invalid) {
+              <span class="error-msg">Password must be at least 6 characters long.</span>
+            }
+          </div>
+
+          <!-- Confirm Password -->
+          <div class="input-group" [class.has-error]="registerForm.controls.confirmPassword.touched && registerForm.controls.confirmPassword.invalid">
+            <label for="reg-confirm-password">Confirm Password</label>
+            <div class="input-wrapper">
+              <svg class="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/>
+                <path d="m9 12 2 2 4-4"/>
+              </svg>
+              <input 
+                id="reg-confirm-password"
+                [type]="showConfirmPassword ? 'text' : 'password'" 
+                formControlName="confirmPassword" 
+                placeholder="Re-enter password" 
+                autocomplete="new-password" />
+              <button 
+                type="button" 
+                class="toggle-pwd-btn" 
+                (click)="toggleConfirmPassword()" 
+                [attr.aria-label]="showConfirmPassword ? 'Hide password' : 'Show password'">
+                @if (showConfirmPassword) {
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/>
+                    <path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/>
+                    <path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/>
+                    <line x1="2" y1="2" x2="22" y2="22"/>
+                  </svg>
+                } @else {
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/>
+                    <circle cx="12" cy="12" r="3"/>
+                  </svg>
+                }
+              </button>
+            </div>
+            @if (registerForm.controls.confirmPassword.touched && registerForm.controls.confirmPassword.invalid) {
+              <span class="error-msg">
+                @if (registerForm.controls.confirmPassword.errors?.['required']) {
+                  Please confirm your password.
+                } @else if (registerForm.controls.confirmPassword.errors?.['passwordMismatch']) {
+                  Passwords do not match.
+                }
+              </span>
+            }
+          </div>
+
+          <!-- Terms Checkbox -->
+          <div class="form-row-terms">
+            <label class="checkbox-label" [class.has-error]="registerForm.controls.agreeTerms.touched && registerForm.controls.agreeTerms.invalid">
+              <input type="checkbox" formControlName="agreeTerms" />
+              <span class="custom-checkbox"></span>
+              I agree to the <a href="javascript:void(0)" class="terms-link">Terms of Service</a> and <a href="javascript:void(0)" class="terms-link">Privacy Policy</a>
+            </label>
+            @if (registerForm.controls.agreeTerms.touched && registerForm.controls.agreeTerms.invalid) {
+              <span class="error-msg">You must accept the terms to continue.</span>
+            }
+          </div>
+
+          <!-- Register Submit Button -->
+          <button type="submit" class="primary-btn" [disabled]="isRegisterSubmitting">
+            @if (isRegisterSubmitting) {
+              <span class="spinner"></span>
+              Creating Account...
+            } @else {
+              <span>Create Marketplace Account</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="btn-arrow">
+                <line x1="5" y1="12" x2="19" y2="12"/>
+                <polyline points="12 5 19 12 12 19"/>
+              </svg>
+            }
+          </button>
+        </form>
+
+        <div class="card-footer">
+          <span>Already registered?</span>
+          <button type="button" class="text-link-btn" (click)="setTab('login')">Sign in here</button>
+        </div>
+      </div>
+    }
+
+    <!-- Marketplace Trust Badges -->
+    <div class="trust-footer">
+      <div class="trust-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/>
+        </svg>
+        <span>Buyer Protection</span>
+      </div>
+      <div class="trust-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"/>
+          <path d="m9 12 2 2 4-4"/>
+        </svg>
+        <span>Verified Vendors</span>
+      </div>
+      <div class="trust-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect width="20" height="14" x="2" y="5" rx="2"/>
+          <line x1="2" y1="10" x2="22" y2="10"/>
+        </svg>
+        <span>Secure Escrow</span>
+              </div>
     </div>
   </div>
 </div>

@@ -1,5 +1,16 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap');
 
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+:root {
+  --primary: #7655e9;
+  --primary-hover: #6343dc;
+  --secondary: #3478ed;
+  --accent: #f43f5e;
+  --bg-dark: #0e101f;
+  --surface-dark: #151830;
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+  --border-subtle: rgba(255, 255, 255, 0.12);
+}
 
 /* Global Styles */
 *,
@@ -10,21 +21,18 @@
   padding: 0;
 }
 
-html {
-  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+html,
+body {
+  min-height: 100%;
+  font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background-color: var(--bg-dark);
+  color: var(--text-primary);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  color: #0f172a;
-  background-color: #f8fafc;
-  scroll-behavior: smooth;
 }
 
 body {
-  min-height: 100vh;
-  margin: 0;
-  padding: 0;
   line-height: 1.5;
-  background-color: #f8fafc;
 }
 
 button,
@@ -35,6 +43,7 @@ textarea {
 }
 
 a {
+  text-decoration: none;
   color: inherit;
 }
 
