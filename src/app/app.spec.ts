@@ -12,14 +12,23 @@ describe('App', () => {
 
   it('should create the app', () => {
     const fixture = TestBed.createComponent(App);
-    const app = fixture.componentInstance;
-    expect(app).toBeTruthy();
+    expect(fixture.componentInstance).toBeTruthy();
   });
 
-  it('should render brand logo text', async () => {
+  it('should render the MarketHub brand', async () => {
     const fixture = TestBed.createComponent(App);
     await fixture.whenStable();
+
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('.brand-name')?.textContent).toContain('MarketHub');
+
+    expect(compiled.querySelector('.brand-name')?.textContent)
+      .toContain('MarketHub');
+  });
+
+  it('should render the router outlet', () => {
+    const fixture = TestBed.createComponent(App);
+    const compiled = fixture.nativeElement as HTMLElement;
+
+    expect(compiled.querySelector('router-outlet')).toBeTruthy();
   });
 });

@@ -1,138 +1,79 @@
 <div class="app-layout">
+
   <!-- Announcement Bar -->
   <div class="announcement-bar">
     <div class="announcement-content">
-      <span class="announcement-badge">Group 1 Project</span>
-      <span>Multi-Vendor E-Commerce Marketplace • <strong>Student 2: Product Catalogue & Search</strong></span>
+      <span class="announcement-badge">Group Project</span>
+      <span>Multi-Vendor E-Commerce Marketplace</span>
     </div>
+
     <div class="role-pills">
       <span class="role-pill-label">Modules:</span>
       <a routerLink="/auth" class="role-pill" routerLinkActive="active">S1: Auth</a>
-      <a routerLink="/products" class="role-pill active" routerLinkActive="active">S2: Catalogue</a>
+      <a routerLink="/products" class="role-pill" routerLinkActive="active">S2: Catalogue</a>
       <a routerLink="/cart" class="role-pill" routerLinkActive="active">S3: Cart</a>
       <a routerLink="/seller" class="role-pill" routerLinkActive="active">S4: Seller</a>
-      <a routerLink="/admin" class="role-pill" routerLinkActive="active">S5: Admin</a>
+      <a routerLink="/admin/dashboard" class="role-pill" routerLinkActive="active">S5: Admin</a>
     </div>
   </div>
 
-  <!-- Main Navigation Header -->
+  <!-- Main Navigation -->
   <header class="app-navbar">
     <div class="nav-container">
-      <!-- Logo -->
+
       <a routerLink="/products" class="brand-logo">
-        <div class="logo-icon">
-          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2">
-            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
-            <line x1="3" y1="6" x2="21" y2="6"></line>
-            <path d="M16 10a4 4 0 0 1-8 0"></path>
-          </svg>
-        </div>
+        <div class="logo-icon">🛍️</div>
         <div class="brand-text">
           <span class="brand-name">MarketHub</span>
           <span class="brand-tag">Multi-Vendor</span>
         </div>
       </a>
 
-      <!-- Primary Nav Links -->
       <nav class="nav-links">
-        <a routerLink="/products" routerLinkActive="nav-active" class="nav-item">
-          <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2">
-            <rect x="3" y="3" width="7" height="7"></rect>
-            <rect x="14" y="3" width="7" height="7"></rect>
-            <rect x="14" y="14" width="7" height="7"></rect>
-            <rect x="3" y="14" width="7" height="7"></rect>
-          </svg>
-          <span>Products</span>
-        </a>
-
-        <a routerLink="/cart" routerLinkActive="nav-active" class="nav-item cart-nav-item">
-          <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="9" cy="21" r="1"></circle>
-            <circle cx="20" cy="21" r="1"></circle>
-            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
-          </svg>
-          <span>Cart</span>
-          <span *ngIf="productService.cartCount() > 0" class="counter-badge">
-            {{ productService.cartCount() }}
-          </span>
-        </a>
-
-        <a routerLink="/seller" routerLinkActive="nav-active" class="nav-item">
-          <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-            <polyline points="9 22 9 12 15 12 15 22"></polyline>
-          </svg>
-          <span>Seller Portal</span>
-        </a>
-
-        <a routerLink="/admin" routerLinkActive="nav-active" class="nav-item">
-          <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2">
-            <line x1="18" y1="20" x2="18" y2="10"></line>
-            <line x1="12" y1="20" x2="12" y2="4"></line>
-            <line x1="6" y1="20" x2="6" y2="14"></line>
-          </svg>
-          <span>Admin</span>
-        </a>
-
-        <a routerLink="/auth" routerLinkActive="nav-active" class="nav-item auth-btn">
-          <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-            <circle cx="12" cy="7" r="4"></circle>
-          </svg>
-          <span>Sign In / Demo</span>
-        </a>
+        <a routerLink="/products" routerLinkActive="nav-active" class="nav-item">Products</a>
+        <a routerLink="/cart" routerLinkActive="nav-active" class="nav-item">Cart</a>
+        <a routerLink="/seller" routerLinkActive="nav-active" class="nav-item">Seller Portal</a>
+        <a routerLink="/admin/dashboard" routerLinkActive="nav-active" class="nav-item">Admin</a>
+        <a routerLink="/auth" routerLinkActive="nav-active" class="nav-item auth-btn">Sign In</a>
       </nav>
+
     </div>
   </header>
 
-  <!-- Router Outlet for Child Modules -->
-  <div class="main-viewport">
+  <!-- All Modules Load Here -->
+  <main class="main-viewport">
     <router-outlet></router-outlet>
-  </div>
+  </main>
 
-  <!-- Global Footer -->
+  <!-- Footer -->
   <footer class="app-footer">
     <div class="footer-container">
       <div class="footer-top">
-        <div class="footer-brand-col">
-          <div class="footer-logo">
-            <span class="brand-name">MarketHub</span>
-            <span class="brand-sub">Multi-Vendor Marketplace</span>
-          </div>
+
+        <div>
+          <span class="brand-name">MarketHub</span>
           <p class="footer-desc">
-            A complete Angular 22 enterprise multi-vendor e-commerce platform built as an integrated group collaboration project.
+            A complete multi-vendor e-commerce marketplace built with Angular.
           </p>
         </div>
 
-        <div class="footer-modules-col">
-          <h5 class="footer-col-title">Project Module Allocation</h5>
+        <div>
+          <h5 class="footer-col-title">Project Modules</h5>
           <ul class="footer-module-list">
-            <li><strong>Student 1:</strong> User Authentication & Profile Management</li>
-            <li class="highlight-student"><strong>Student 2:</strong> Product Catalogue & Search (Active Module)</li>
-            <li><strong>Student 3:</strong> Cart, Wishlist & Checkout</li>
-            <li><strong>Student 4:</strong> Seller Dashboard & Inventory</li>
-            <li><strong>Student 5:</strong> Admin Dashboard, Reports & Integration</li>
+            <li>Student 1: Authentication & Profile</li>
+            <li>Student 2: Product Catalogue & Search</li>
+            <li>Student 3: Cart, Wishlist & Checkout</li>
+            <li>Student 4: Seller Dashboard & Inventory</li>
+            <li>Student 5: Admin Dashboard & Reports</li>
           </ul>
         </div>
 
-        <div class="footer-features-col">
-          <h5 class="footer-col-title">Student 2 Deliverables</h5>
-          <ul class="footer-features-list">
-            <li>✓ Responsive Product Listing & Grid/List view modes</li>
-            <li>✓ Comprehensive Product Detail view with gallery & specs</li>
-            <li>✓ Multi-vendor seller badges & verified indicators</li>
-            <li>✓ Category filters with live product counts</li>
-            <li>✓ Real-time multi-field search and clear controls</li>
-            <li>✓ Multi-criteria sorting (Price, Rating, Newest, Name)</li>
-            <li>✓ Friendly empty-result state with one-click reset</li>
-            <li>✓ Reusable product cards with stock & wishlist tags</li>
-          </ul>
-        </div>
       </div>
 
       <div class="footer-bottom">
-        <p>© {{ currentYear }} MarketHub Inc. All rights reserved • Angular Main Project Allocation</p>
+        <p>© 2026 MarketHub. All rights reserved.</p>
       </div>
     </div>
   </footer>
+
 </div>
