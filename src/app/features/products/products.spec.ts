@@ -11,7 +11,7 @@ describe('Products Component (Student 2: Product Catalogue & Search)', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [Products],
-      providers: [provideRouter([]), ProductService]
+      providers: [provideRouter([])],
     }).compileComponents();
 
     fixture = TestBed.createComponent(Products);

@@ -1,57 +1,81 @@
+
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Product, ProductFilterCriteria, SellerInfo, SortOption } from './models/product.model';
-import { ProductService, CartItemNotification } from './services/product.service';
+
+import {
+  Product,
+  ProductFilterCriteria,
+  SellerInfo,
+  SortOption
+} from './models/product.model';
+
+import { ProductService } from './services/product.service';
 import { ProductCardComponent } from './components/product-card/product-card.component';
 import { ProductDetailComponent } from './components/product-detail/product-detail.component';
+
+import { CartService } from '../../core/services/cart.service';
+import {
+  Product as CartProduct
+} from '../../core/models/marketplace.models';
 
 @Component({
   selector: 'app-products',
   standalone: true,
-  imports: [CommonModule, FormsModule, ProductCardComponent, ProductDetailComponent],
+  imports: [
+    CommonModule,
+    FormsModule,
+    ProductCardComponent,
+    ProductDetailComponent
+  ],
   templateUrl: './products.html',
   styleUrl: './products.css'
 })
 export class Products implements OnInit {
+
   protected readonly productService = inject(ProductService);
+  readonly cartService = inject(CartService);
+
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
 
-  // Filter Criteria State
+  toastMessage = signal<string | null>(null);
+
   searchQuery: string = '';
   selectedCategory: string = 'All';
   selectedSellerId: string = 'All';
+
   minPrice: number | null = null;
   maxPrice: number | null = null;
   minRating: number = 0;
   inStockOnly: boolean = false;
-  sortBy: SortOption = 'featured';
 
-  // Layout & UI State
+  sortBy: SortOption = 'featured';
   viewMode: 'grid' | 'list' = 'grid';
   showMobileFilters: boolean = false;
+
   selectedProduct: Product | null = null;
 
-  // Available Filter Options
   categories: string[] = [];
   sellers: SellerInfo[] = [];
-
-  // Filtered Products Output
   filteredProducts: Product[] = [];
 
   ngOnInit(): void {
-    this.categories = ['All', ...this.productService.getCategories()];
+    this.categories = [
+      'All',
+      ...this.productService.getCategories()
+    ];
+
     this.sellers = this.productService.getSellers();
 
-    // Check if route has an id (e.g. /products/:id)
     this.route.paramMap.subscribe((params) => {
       const id = params.get('id');
+
       if (id) {
-        const prod = this.productService.getProductById(id);
-        if (prod) {
-          this.selectedProduct = prod;
+        const product = this.productService.getProductById(id);
+        if (product) {
+          this.selectedProduct = product;
         }
       } else {
         this.selectedProduct = null;
@@ -73,7 +97,8 @@ export class Products implements OnInit {
       sortBy: this.sortBy
     };
 
-    this.filteredProducts = this.productService.filterProducts(criteria);
+    this.filteredProducts =
+      this.productService.filterProducts(criteria);
   }
 
   onSearchChange(): void {
@@ -103,6 +128,7 @@ export class Products implements OnInit {
     this.minRating = 0;
     this.inStockOnly = false;
     this.sortBy = 'featured';
+
     this.applyFilters();
   }
 
@@ -114,34 +140,40 @@ export class Products implements OnInit {
       this.minPrice !== null ||
       this.maxPrice !== null ||
       this.minRating > 0 ||
-      this.inStockOnly ||
-      this.sortBy !== 'featured'
+      this.inStockOnly
     );
   }
 
   get activeFilterCount(): number {
     let count = 0;
-    if (this.searchQuery.trim() !== '') count++;
+
+    if (this.searchQuery.trim()) count++;
     if (this.selectedCategory !== 'All') count++;
     if (this.selectedSellerId !== 'All') count++;
-    if (this.minPrice !== null || this.maxPrice !== null) count++;
+    if (this.minPrice !== null) count++;
+    if (this.maxPrice !== null) count++;
     if (this.minRating > 0) count++;
     if (this.inStockOnly) count++;
+
     return count;
   }
 
   getCategoryCount(category: string): number {
-    const all = this.productService.getProducts();
-    if (category === 'All') return all.length;
-    return all.filter((p) => p.category === category).length;
+    const products = this.productService.getProducts();
+
+    if (category === 'All') {
+      return products.length;
+    }
+
+    return products.filter(
+      product =>
+        product.category.toLowerCase() === category.toLowerCase()
+    ).length;
   }
 
-  // Product Selection & Details view
   openProductDetail(product: Product): void {
     this.selectedProduct = product;
-    // Update URL without full page reload
     this.router.navigate(['/products', product.id]);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   closeProductDetail(): void {
@@ -151,5 +183,66 @@ export class Products implements OnInit {
 
   toggleMobileFilters(): void {
     this.showMobileFilters = !this.showMobileFilters;
+  }
+
+  // Convert development Product model into Cart Product model.
+  private convertProduct(product: Product): CartProduct {
+    return {
+      id: product.id,
+      name: product.name,
+      description: product.description,
+      price: product.price,
+      originalPrice: product.originalPrice,
+      category: product.category,
+      sellerId: product.seller.id,
+      sellerName: product.seller.name,
+      sellerRating: product.seller.rating,
+      imageUrl: product.imageUrl,
+      rating: product.rating,
+      reviewCount: product.reviewsCount,
+      inStock: product.stock > 0,
+      stockCount: product.stock,
+      tags: product.tags
+    };
+  }
+
+  // Add product to the shared cart.
+  addToCart(product: Product): void {
+    if (product.stock <= 0) {
+      this.showToast('Product is out of stock!');
+      return;
+    }
+
+    this.cartService.addToCart(
+      this.convertProduct(product),
+      1
+    );
+
+    this.showToast(`${product.name} added to cart!`);
+  }
+
+  // Add or remove product from the shared wishlist.
+  toggleWishlist(product: Product): void {
+    const added = this.cartService.toggleWishlist(
+      this.convertProduct(product)
+    );
+
+    this.showToast(
+      added
+        ? 'Added to Wishlist ❤️'
+        : 'Removed from Wishlist'
+    );
+  }
+
+  isInWishlist(productId: string): boolean {
+    return this.cartService.isInWishlist(productId);
+  }
+
+  showToast(message: string): void {
+    this.toastMessage.set(message);
+
+    setTimeout(() => {
+      this.toastMessage.set(null);
+    }, 2500);
   }
 }

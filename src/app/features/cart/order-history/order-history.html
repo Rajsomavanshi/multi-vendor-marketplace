@@ -1,0 +1,77 @@
+<div class="orders-container">
+  <div class="page-header">
+    <div>
+      <span class="role-badge">Student 3 Deliverable</span>
+      <h1 class="page-title">My Orders</h1>
+      <p class="page-subtitle">Track your mock multi-vendor orders, review line items, and inspect order receipts.</p>
+    </div>
+    <a routerLink="/products" class="btn btn-outline">
+      ← Continue Shopping
+    </a>
+  </div>
+
+  @if (cartService.orders().length === 0) {
+    <div class="empty-state-card">
+      <div class="empty-icon-wrap">📦</div>
+      <h2>No Orders Placed Yet</h2>
+      <p>Place a mock order through the cart and checkout flow to see order details here.</p>
+      <div class="empty-actions">
+        <a routerLink="/cart" class="btn btn-primary">Go to Cart</a>
+        <a routerLink="/products" class="btn btn-secondary">Browse Products</a>
+      </div>
+    </div>
+  } @else {
+    <div class="orders-list">
+      @for (order of cartService.orders(); track order.id) {
+        <div class="order-card">
+          <div class="order-card-header">
+            <div class="order-meta-group">
+              <div>
+                <span class="label">Order Placed</span>
+                <span class="val">{{ order.createdAt | date: 'mediumDate' }}</span>
+              </div>
+              <div>
+                <span class="label">Total Amount</span>
+                <span class="val total-val">₹{{ order.total | number }}</span>
+              </div>
+              <div>
+                <span class="label">Ship To</span>
+                <span class="val">{{ order.shippingAddress.fullName }}</span>
+              </div>
+            </div>
+
+            <div class="order-id-group">
+              <span class="order-no">{{ order.orderNumber }}</span>
+              <a [routerLink]="['/order-confirmation', order.id]" class="view-receipt-link">
+                View Receipt →
+              </a>
+            </div>
+          </div>
+
+          <div class="order-card-body">
+            <div class="status-strip">
+              <span class="status-pill confirmed">● {{ order.orderStatus }}</span>
+              <span class="delivery-estimate">
+                Estimated Delivery: <strong>{{ order.estimatedDeliveryDate | date: 'fullDate' }}</strong>
+              </span>
+            </div>
+
+            <div class="order-items-scroll">
+              @for (item of order.items; track item.productId) {
+                <div class="item-mini-card">
+                  <img [src]="item.imageUrl" [alt]="item.productName" />
+                  <div class="item-meta">
+                    <span class="name">{{ item.productName }}</span>
+                    <span class="seller">Sold by {{ item.sellerName }}</span>
+                    <span class="qty">Qty: {{ item.quantity }} × ₹{{ item.price | number }}</span>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>
+

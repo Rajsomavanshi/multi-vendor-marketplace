@@ -1,11 +1,11 @@
+
 <div class="products-module-root">
-  <!-- Toast Notification Feedback -->
-  <div class="toast-notification" *ngIf="productService.activeNotification() as notif" [class.info]="notif.type === 'info'">
-    <div class="toast-icon">
-      <span *ngIf="notif.type === 'success'">✓</span>
-      <span *ngIf="notif.type === 'info'">ℹ</span>
-    </div>
-    <div class="toast-body">{{ notif.message }}</div>
+
+  <!-- Integrated Toast Notification -->
+  <div class="toast-notification" *ngIf="toastMessage() as message">
+    <div class="toast-icon">✓</div>
+    <div class="toast-body">{{ message }}</div>
+    <button type="button" (click)="toastMessage.set(null)">×</button>
   </div>
 
   <!-- Detail View or Catalogue View -->
@@ -17,30 +17,32 @@
     ></app-product-detail>
   </div>
 
-  <!-- Product Catalogue View -->
+  <!-- Product Catalogue -->
   <ng-template #catalogueView>
-    <!-- Marketplace Hero Header -->
+
+    <!-- Marketplace Hero -->
     <header class="marketplace-hero">
       <div class="hero-content">
         <span class="hero-badge">Multi-Vendor E-Commerce Platform</span>
         <h1 class="hero-title">Product Catalogue & Discovery</h1>
         <p class="hero-subtitle">
-          Explore curated collections from verified independent sellers, global brands, and artisanal makers.
+          Explore curated collections from verified independent sellers,
+          global brands, and artisanal makers.
         </p>
       </div>
 
       <div class="hero-stats">
         <div class="stat-box">
-          <span class="stat-number">100</span>
+          <span class="stat-number">{{ filteredProducts.length }}</span>
           <span class="stat-label">Products</span>
         </div>
         <div class="stat-box">
-          <span class="stat-number">10</span>
+          <span class="stat-number">{{ categories.length - 1 }}</span>
           <span class="stat-label">Categories</span>
         </div>
         <div class="stat-box">
-          <span class="stat-number">10</span>
-          <span class="stat-label">Verified Sellers</span>
+          <span class="stat-number">{{ sellers.length }}</span>
+          <span class="stat-label">Sellers</span>
         </div>
         <div class="stat-box">
           <span class="stat-number">100%</span>
@@ -49,15 +51,49 @@
       </div>
     </header>
 
-    <!-- Search & Quick Categories Navigation -->
+    <!-- Cart and Wishlist Quick Banner -->
+    <section class="demo-quick-banner">
+      <div class="banner-left">
+        <span class="tag">Cart & Wishlist Active</span>
+        <span>
+          Items in Cart:
+          <strong>{{ cartService.itemCount() }}</strong>
+          |
+          In Wishlist:
+          <strong>{{ cartService.wishlistCount() }}</strong>
+        </span>
+      </div>
+
+      <div class="banner-right">
+        <a href="/cart" class="btn btn-sm btn-primary">
+          Go to Cart (₹{{ cartService.subtotal() | number:'1.0-2' }}) →
+        </a>
+
+        <a href="/wishlist" class="btn btn-sm btn-outline">
+          View Wishlist →
+        </a>
+      </div>
+    </section>
+
+    <!-- Search and Category Navigation -->
     <section class="search-category-section">
+
       <!-- Search Bar -->
       <div class="search-bar-wrapper">
         <div class="search-input-box">
-          <svg class="search-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+          <svg
+            class="search-icon"
+            viewBox="0 0 24 24"
+            width="20"
+            height="20"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
             <circle cx="11" cy="11" r="8"></circle>
             <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
           </svg>
+
           <input
             type="text"
             class="search-input"
@@ -66,6 +102,7 @@
             placeholder="Search products, brands, categories, or seller stores..."
             aria-label="Search products"
           />
+
           <button
             type="button"
             *ngIf="searchQuery.trim().length > 0"
@@ -94,10 +131,12 @@
         </div>
       </div>
 
-      <!-- Active Filters Chips Bar -->
+      <!-- Active Filter Chips -->
       <div class="active-chips-bar" *ngIf="hasActiveFilters()">
         <span class="active-chips-label">Active Filters:</span>
+
         <div class="chips-list">
+
           <span class="filter-chip" *ngIf="searchQuery.trim() !== ''">
             Search: "{{ searchQuery }}"
             <button type="button" class="chip-remove" (click)="clearSearch()">✕</button>
@@ -110,63 +149,97 @@
 
           <span class="filter-chip" *ngIf="selectedSellerId !== 'All'">
             Seller Filter
-            <button type="button" class="chip-remove" (click)="selectedSellerId = 'All'; onFilterChange()">✕</button>
+            <button
+              type="button"
+              class="chip-remove"
+              (click)="selectedSellerId = 'All'; onFilterChange()"
+            >✕</button>
           </span>
 
           <span class="filter-chip" *ngIf="minPrice !== null || maxPrice !== null">
             Price: ${{ minPrice || 0 }} - ${{ maxPrice || 'Any' }}
-            <button type="button" class="chip-remove" (click)="minPrice = null; maxPrice = null; onFilterChange()">✕</button>
+            <button
+              type="button"
+              class="chip-remove"
+              (click)="minPrice = null; maxPrice = null; onFilterChange()"
+            >✕</button>
           </span>
 
           <span class="filter-chip" *ngIf="minRating > 0">
             Rating: {{ minRating }}★ & above
-            <button type="button" class="chip-remove" (click)="minRating = 0; onFilterChange()">✕</button>
+            <button
+              type="button"
+              class="chip-remove"
+              (click)="minRating = 0; onFilterChange()"
+            >✕</button>
           </span>
 
           <span class="filter-chip" *ngIf="inStockOnly">
             In Stock Only
-            <button type="button" class="chip-remove" (click)="inStockOnly = false; onFilterChange()">✕</button>
+            <button
+              type="button"
+              class="chip-remove"
+              (click)="inStockOnly = false; onFilterChange()"
+            >✕</button>
           </span>
 
           <button type="button" class="reset-all-btn" (click)="resetFilters()">
             Clear All
           </button>
+
         </div>
       </div>
     </section>
 
-    <!-- Main Catalogue Body: Sidebar Filters + Products Grid -->
+    <!-- Catalogue Layout -->
     <div class="catalogue-layout">
-      <!-- Filter Sidebar (Desktop & Mobile Drawer) -->
+
+      <!-- Filter Sidebar -->
       <aside class="filters-sidebar" [class.mobile-open]="showMobileFilters">
+
         <div class="sidebar-header">
           <div class="sidebar-title-group">
-            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+            <svg
+              viewBox="0 0 24 24"
+              width="18"
+              height="18"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
               <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
             </svg>
             <h3 class="sidebar-title">Filters</h3>
           </div>
-          <button type="button" class="close-mobile-filters" (click)="toggleMobileFilters()">✕</button>
+
+          <button
+            type="button"
+            class="close-mobile-filters"
+            (click)="toggleMobileFilters()"
+          >✕</button>
         </div>
 
-        <!-- Filter 1: Multi-Vendor Seller Selection -->
+        <!-- Seller Filter -->
         <div class="filter-group">
           <h4 class="filter-heading">Sellers & Stores</h4>
+
           <select
             class="filter-select"
             [(ngModel)]="selectedSellerId"
             (change)="onFilterChange()"
           >
             <option value="All">All Sellers (Marketplace)</option>
+
             <option *ngFor="let s of sellers" [value]="s.id">
               {{ s.name }} ({{ s.rating }}★)
             </option>
           </select>
         </div>
 
-        <!-- Filter 2: Price Range -->
+        <!-- Price Filter -->
         <div class="filter-group">
           <h4 class="filter-heading">Price Range ($)</h4>
+
           <div class="price-inputs-row">
             <input
               type="number"
@@ -176,7 +249,9 @@
               placeholder="Min"
               min="0"
             />
+
             <span class="price-dash">–</span>
+
             <input
               type="number"
               class="price-input"
@@ -188,9 +263,10 @@
           </div>
         </div>
 
-        <!-- Filter 3: Customer Rating -->
+        <!-- Rating Filter -->
         <div class="filter-group">
           <h4 class="filter-heading">Minimum Customer Rating</h4>
+
           <div class="rating-options">
             <label class="radio-label">
               <input
@@ -202,6 +278,7 @@
               />
               <span>Any Rating</span>
             </label>
+
             <label class="radio-label">
               <input
                 type="radio"
@@ -213,6 +290,7 @@
               <span class="stars-inline">★★★★½</span>
               <span>4.5 & up</span>
             </label>
+
             <label class="radio-label">
               <input
                 type="radio"
@@ -224,6 +302,7 @@
               <span class="stars-inline">★★★★☆</span>
               <span>4.0 & up</span>
             </label>
+
             <label class="radio-label">
               <input
                 type="radio"
@@ -238,9 +317,10 @@
           </div>
         </div>
 
-        <!-- Filter 4: Stock Availability -->
+        <!-- Stock Filter -->
         <div class="filter-group">
           <h4 class="filter-heading">Availability</h4>
+
           <label class="checkbox-label">
             <input
               type="checkbox"
@@ -251,7 +331,6 @@
           </label>
         </div>
 
-        <!-- Sidebar Action: Reset -->
         <button
           type="button"
           class="sidebar-reset-btn"
@@ -260,19 +339,37 @@
         >
           Reset All Filters
         </button>
+
       </aside>
 
-      <!-- Main Products View Area -->
+      <!-- Products Display -->
       <main class="products-display-area">
-        <!-- Control Toolbar: Result Count, Mobile Filter Button, Sort Dropdown, View Mode Toggle -->
+
+        <!-- Toolbar -->
         <div class="catalogue-toolbar">
+
           <div class="toolbar-left">
-            <button type="button" class="mobile-filter-trigger-btn" (click)="toggleMobileFilters()">
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+            <button
+              type="button"
+              class="mobile-filter-trigger-btn"
+              (click)="toggleMobileFilters()"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                width="16"
+                height="16"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
                 <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
               </svg>
+
               <span>Filters</span>
-              <span *ngIf="activeFilterCount > 0" class="toolbar-filter-badge">{{ activeFilterCount }}</span>
+
+              <span *ngIf="activeFilterCount > 0" class="toolbar-filter-badge">
+                {{ activeFilterCount }}
+              </span>
             </button>
 
             <span class="results-count-text">
@@ -281,9 +378,11 @@
           </div>
 
           <div class="toolbar-right">
+
             <!-- Sort Dropdown -->
             <div class="sort-selector-wrapper">
               <label for="sortBySelect" class="sort-label">Sort by:</label>
+
               <select
                 id="sortBySelect"
                 class="sort-select"
@@ -300,7 +399,7 @@
               </select>
             </div>
 
-            <!-- View Mode Switcher -->
+            <!-- Grid/List View -->
             <div class="view-mode-toggle">
               <button
                 type="button"
@@ -310,13 +409,21 @@
                 title="Grid View"
                 aria-label="Grid View"
               >
-                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                <svg
+                  viewBox="0 0 24 24"
+                  width="16"
+                  height="16"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
                   <rect x="3" y="3" width="7" height="7"></rect>
                   <rect x="14" y="3" width="7" height="7"></rect>
                   <rect x="14" y="14" width="7" height="7"></rect>
                   <rect x="3" y="14" width="7" height="7"></rect>
                 </svg>
               </button>
+
               <button
                 type="button"
                 class="view-btn"
@@ -325,7 +432,14 @@
                 title="List View"
                 aria-label="List View"
               >
-                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                <svg
+                  viewBox="0 0 24 24"
+                  width="16"
+                  height="16"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
                   <line x1="8" y1="6" x2="21" y2="6"></line>
                   <line x1="8" y1="12" x2="21" y2="12"></line>
                   <line x1="8" y1="18" x2="21" y2="18"></line>
@@ -335,10 +449,11 @@
                 </svg>
               </button>
             </div>
+
           </div>
         </div>
 
-        <!-- Products Grid / List View using Reusable Product Card -->
+        <!-- Reusable Product Cards -->
         <div
           *ngIf="filteredProducts.length > 0"
           class="products-grid-container"
@@ -349,33 +464,56 @@
             [product]="item"
             [viewMode]="viewMode"
             (viewDetails)="openProductDetail($event)"
+            (addToCart)="addToCart($event)"
+            (toggleWishlist)="toggleWishlist($event)"
           ></app-product-card>
         </div>
 
-        <!-- Empty-Result State Message -->
-        <div *ngIf="filteredProducts.length === 0" class="empty-results-box">
+        <!-- Empty Results -->
+        <div
+          *ngIf="filteredProducts.length === 0"
+          class="empty-results-box"
+        >
           <div class="empty-illustration">
-            <svg viewBox="0 0 64 64" width="72" height="72" fill="none" stroke="#94a3b8" stroke-width="2">
+            <svg
+              viewBox="0 0 64 64"
+              width="72"
+              height="72"
+              fill="none"
+              stroke="#94a3b8"
+              stroke-width="2"
+            >
               <circle cx="28" cy="28" r="20"></circle>
               <line x1="43" y1="43" x2="58" y2="58" stroke-width="3"></line>
               <line x1="22" y1="28" x2="34" y2="28"></line>
             </svg>
           </div>
+
           <h3 class="empty-title">No products match your criteria</h3>
+
           <p class="empty-description">
-            We couldn't find any items matching your selected category, filters, or search term:
+            We couldn't find any items matching your selected category,
+            filters, or search term:
             <strong *ngIf="searchQuery">"{{ searchQuery }}"</strong>.
           </p>
+
           <ul class="empty-tips">
             <li>Check for spelling errors in your search query</li>
             <li>Broaden your price range or rating filter</li>
             <li>Select a different category or choose "All Sellers"</li>
           </ul>
-          <button type="button" class="empty-reset-cta" (click)="resetFilters()">
+
+          <button
+            type="button"
+            class="empty-reset-cta"
+            (click)="resetFilters()"
+          >
             Reset All Filters
           </button>
         </div>
+
       </main>
     </div>
+
   </ng-template>
 </div>

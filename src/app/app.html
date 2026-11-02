@@ -1,79 +1,50 @@
-<div class="app-layout">
+<div class="app-shell">
+  <app-navbar></app-navbar>
 
-  <!-- Announcement Bar -->
-  <div class="announcement-bar">
-    <div class="announcement-content">
-      <span class="announcement-badge">Group Project</span>
-      <span>Multi-Vendor E-Commerce Marketplace</span>
-    </div>
-
-    <div class="role-pills">
-      <span class="role-pill-label">Modules:</span>
-      <a routerLink="/auth" class="role-pill" routerLinkActive="active">S1: Auth</a>
-      <a routerLink="/products" class="role-pill" routerLinkActive="active">S2: Catalogue</a>
-      <a routerLink="/cart" class="role-pill" routerLinkActive="active">S3: Cart</a>
-      <a routerLink="/seller" class="role-pill" routerLinkActive="active">S4: Seller</a>
-      <a routerLink="/admin/dashboard" class="role-pill" routerLinkActive="active">S5: Admin</a>
-    </div>
-  </div>
-
-  <!-- Main Navigation -->
-  <header class="app-navbar">
-    <div class="nav-container">
-
-      <a routerLink="/products" class="brand-logo">
-        <div class="logo-icon">🛍️</div>
-        <div class="brand-text">
-          <span class="brand-name">MarketHub</span>
-          <span class="brand-tag">Multi-Vendor</span>
-        </div>
-      </a>
-
-      <nav class="nav-links">
-        <a routerLink="/products" routerLinkActive="nav-active" class="nav-item">Products</a>
-        <a routerLink="/cart" routerLinkActive="nav-active" class="nav-item">Cart</a>
-        <a routerLink="/seller" routerLinkActive="nav-active" class="nav-item">Seller Portal</a>
-        <a routerLink="/admin/dashboard" routerLinkActive="nav-active" class="nav-item">Admin</a>
-        <a routerLink="/auth" routerLinkActive="nav-active" class="nav-item auth-btn">Sign In</a>
-      </nav>
-
-    </div>
-  </header>
-
-  <!-- All Modules Load Here -->
-  <main class="main-viewport">
+  <main class="app-main">
     <router-outlet></router-outlet>
   </main>
 
-  <!-- Footer -->
   <footer class="app-footer">
     <div class="footer-container">
-      <div class="footer-top">
-
-        <div>
-          <span class="brand-name">MarketHub</span>
-          <p class="footer-desc">
-            A complete multi-vendor e-commerce marketplace built with Angular.
-          </p>
+      <div class="footer-col">
+        <div class="footer-brand">
+          <span class="logo-text">ShopNest</span>
+          <span class="badge-tag">Group 1 Integrated Project</span>
         </div>
 
-        <div>
-          <h5 class="footer-col-title">Project Modules</h5>
-          <ul class="footer-module-list">
-            <li>Student 1: Authentication & Profile</li>
-            <li>Student 2: Product Catalogue & Search</li>
-            <li>Student 3: Cart, Wishlist & Checkout</li>
-            <li>Student 4: Seller Dashboard & Inventory</li>
-            <li>Student 5: Admin Dashboard & Reports</li>
-          </ul>
-        </div>
-
+        <p class="footer-text">
+          A full-featured Angular Multi-Vendor E-Commerce Marketplace built
+          with collaborative modular architecture.
+        </p>
       </div>
 
-      <div class="footer-bottom">
-        <p>© 2026 MarketHub. All rights reserved.</p>
+      <div class="footer-col roles-col">
+        <h4 class="col-title">Project Responsibilities</h4>
+        <ul class="roles-list">
+          <li><strong>Student 1:</strong> User Authentication & Profile Management</li>
+          <li><strong>Student 2:</strong> Product Catalogue & Search</li>
+          <li><strong>Student 3:</strong> Cart, Wishlist & Checkout</li>
+          <li><strong>Student 4:</strong> Seller Dashboard & Inventory</li>
+          <li><strong>Student 5:</strong> Admin Dashboard, Reports & Integration</li>
+        </ul>
+      </div>
+
+      <div class="footer-col quick-col">
+        <h4 class="col-title">Student 3 Features</h4>
+        <ul class="features-list">
+          <li>Multi-vendor Cart with item removal & quantity limits</li>
+          <li>Persistent Wishlist with 1-click move to cart</li>
+          <li>Dynamic Subtotal, Delivery Fee & 5% GST calculations</li>
+          <li>Free delivery threshold progress meter (₹999+)</li>
+          <li>Promo coupons: WELCOME10, FLAT200, FREESHIP</li>
+          <li>Multi-step Mock Checkout & Order Confirmation Receipt</li>
+        </ul>
       </div>
     </div>
-  </footer>
 
+    <div class="footer-bottom">
+      <p>© {{ currentYear }} ShopNest Multi-Vendor Marketplace</p>
+    </div>
+  </footer>
 </div>
