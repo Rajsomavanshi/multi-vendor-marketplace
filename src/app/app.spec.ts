@@ -6,20 +6,30 @@ describe('App', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [App],
-      providers: [provideRouter([])],
+      providers: [provideRouter([])]
     }).compileComponents();
   });
 
   it('should create the app', () => {
     const fixture = TestBed.createComponent(App);
-    const app = fixture.componentInstance;
-    expect(app).toBeTruthy();
+    expect(fixture.componentInstance).toBeTruthy();
   });
 
-  it('should render navbar and logo text', async () => {
+  it('should render navbar and ShopNest logo', async () => {
     const fixture = TestBed.createComponent(App);
+    fixture.detectChanges();
     await fixture.whenStable();
+
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('.brand-name')?.textContent).toContain('ShopNest');
+
+    expect(compiled.querySelector('.brand-name')?.textContent)
+      .toContain('ShopNest');
+  });
+
+  it('should render the router outlet', () => {
+    const fixture = TestBed.createComponent(App);
+    const compiled = fixture.nativeElement as HTMLElement;
+
+    expect(compiled.querySelector('router-outlet')).toBeTruthy();
   });
 });

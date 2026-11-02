@@ -1,0 +1,50 @@
+<div class="orders-page">
+
+    <div class="page-header">
+        <div>
+            <h1>Order Management</h1>
+            <p>Manage and track all marketplace orders.</p>
+        </div>
+        <span class="order-count">{{ orders.length }} Orders</span>
+    </div>
+
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Order ID</th>
+                    <th>Customer</th>
+                    <th>Product</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                    <th>Update Status</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                <tr *ngFor="let order of orders">
+                    <td>{{ order.id }}</td>
+                    <td>{{ order.customer }}</td>
+                    <td>{{ order.product }}</td>
+                    <td>₹{{ order.amount }}</td>
+
+                    <td>
+                        <span class="status" [ngClass]="order.status.toLowerCase()">
+                            {{ order.status }}
+                        </span>
+                    </td>
+
+                    <td>
+                        <select [value]="order.status" (change)="updateStatus(order, $any($event.target).value)">
+                            <option value="Pending">Pending</option>
+                            <option value="Shipped">Shipped</option>
+                            <option value="Delivered">Delivered</option>
+                            <option value="Cancelled">Cancelled</option>
+                        </select>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+</div>

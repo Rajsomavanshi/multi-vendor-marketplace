@@ -1,0 +1,337 @@
+<div class="product-detail-container" *ngIf="product">
+  <!-- Back Button & Breadcrumbs Navigation -->
+  <div class="nav-breadcrumbs-bar">
+    <button type="button" class="back-link-btn" (click)="onBackClick()">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="19" y1="12" x2="5" y2="12"></line>
+        <polyline points="12 19 5 12 12 5"></polyline>
+      </svg>
+      <span>Back to Products Catalogue</span>
+    </button>
+
+    <div class="breadcrumbs">
+      <span>Marketplace</span>
+      <span class="bc-sep">/</span>
+      <span>{{ product.category }}</span>
+      <span class="bc-sep">/</span>
+      <span class="bc-active">{{ product.name }}</span>
+    </div>
+  </div>
+
+  <!-- Main Product View Showcase -->
+  <div class="detail-grid">
+    <!-- Left Column: Gallery -->
+    <div class="gallery-column">
+      <div class="main-image-frame">
+        <img [src]="selectedImage" [alt]="product.name" class="main-image" />
+        <span *ngIf="product.discountPercent > 0" class="badge-detail discount-badge">
+          -{{ product.discountPercent }}% OFF
+        </span>
+        <span *ngIf="product.isBestSeller" class="badge-detail bestseller-badge">
+          ★ Best Seller
+        </span>
+      </div>
+
+      <!-- Thumbnail Selector -->
+      <div class="thumbnails-row" *ngIf="product.galleryImages.length > 1">
+        <button
+          type="button"
+          *ngFor="let img of product.galleryImages"
+          class="thumb-btn"
+          [class.active]="selectedImage === img"
+          (click)="selectedImage = img"
+        >
+          <img [src]="img" [alt]="product.name" class="thumb-img" />
+        </button>
+      </div>
+
+      <!-- Multi-Vendor Seller Showcase Card -->
+      <div class="seller-card">
+        <div class="seller-header">
+          <div class="seller-avatar">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+              <polyline points="9 22 9 12 15 12 15 22"></polyline>
+            </svg>
+          </div>
+          <div class="seller-details">
+            <div class="seller-name-row">
+              <h4 class="seller-title">{{ product.seller.name }}</h4>
+              <span *ngIf="product.seller.isVerified" class="verified-tag" title="Verified Marketplace Merchant">
+                <svg viewBox="0 0 20 20" fill="currentColor" width="14" height="14">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                </svg>
+                Verified Seller
+              </span>
+            </div>
+            <p class="seller-location">📍 {{ product.seller.location }} • {{ product.seller.salesCount }}+ completed orders</p>
+          </div>
+          <div class="seller-rating-badge">
+            <span class="rating-star">★</span>
+            <span class="seller-score">{{ product.seller.rating }}</span>
+          </div>
+        </div>
+
+        <div class="seller-assurances">
+          <div class="assurance-item">
+            <span class="assurance-icon">⚡</span>
+            <span>Fast Dispatch within 24h</span>
+          </div>
+          <div class="assurance-item">
+            <span class="assurance-icon">🛡️</span>
+            <span>Direct Vendor Warranty</span>
+          </div>
+          <div class="assurance-item">
+            <span class="assurance-icon">📦</span>
+            <span>Tracked Safe Delivery</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column: Product Info & Purchase Action -->
+    <div class="info-column">
+      <div class="brand-category-row">
+        <span class="brand-tag">{{ product.brand }}</span>
+        <span class="category-badge">{{ product.category }}</span>
+        <span class="sku-tag">SKU: {{ product.sku }}</span>
+      </div>
+
+      <h1 class="detail-title">{{ product.name }}</h1>
+      <p class="detail-tagline">{{ product.tagline }}</p>
+
+      <!-- Rating and Reviews Summary -->
+      <div class="rating-bar">
+        <div class="stars-display">
+          <span class="star-icon">★★★★★</span>
+        </div>
+        <span class="rating-value">{{ product.rating }} out of 5</span>
+        <span class="bullet-dot">•</span>
+        <a class="reviews-link" (click)="activeTab = 'reviews'">{{ product.reviewsCount }} verified customer reviews</a>
+      </div>
+
+      <!-- Price Section -->
+      <div class="price-section">
+        <div class="price-main-row">
+          <span class="price-tag">${{ product.price | number: '1.2-2' }}</span>
+          <span *ngIf="product.originalPrice > product.price" class="original-strike">
+            ${{ product.originalPrice | number: '1.2-2' }}
+          </span>
+          <span *ngIf="product.discountPercent > 0" class="savings-pill">
+            Save ${{ savings | number: '1.2-2' }} ({{ product.discountPercent }}% off)
+          </span>
+        </div>
+        <p class="tax-note">Inclusive of all local marketplace taxes & merchant invoicing</p>
+      </div>
+
+      <!-- Stock Status Banner -->
+      <div class="stock-banner" [class.low-stock]="product.stock > 0 && product.stock <= 10" [class.out]="product.stock === 0">
+        <div class="stock-dot"></div>
+        <div *ngIf="product.stock > 10">
+          <strong>In Stock</strong> — Ready to ship from {{ product.seller.name }}
+        </div>
+        <div *ngIf="product.stock > 0 && product.stock <= 10">
+          <strong>Hurry! Only {{ product.stock }} units remaining in seller inventory</strong>
+        </div>
+        <div *ngIf="product.stock === 0">
+          <strong>Sold Out</strong> — This vendor is currently replenishing inventory
+        </div>
+      </div>
+
+      <!-- Quantity Selector & Actions -->
+      <div class="actions-card" *ngIf="product.stock > 0">
+        <div class="qty-selector-group">
+          <label class="qty-label">Quantity:</label>
+          <div class="stepper">
+            <button type="button" class="step-btn" (click)="decrementQty()" [disabled]="quantity <= 1">−</button>
+            <span class="qty-number">{{ quantity }}</span>
+            <button type="button" class="step-btn" (click)="incrementQty()" [disabled]="quantity >= product.stock">+</button>
+          </div>
+        </div>
+
+        <div class="buttons-group">
+          <button type="button" class="btn-add-cart" (click)="onAddToCart()">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="9" cy="21" r="1"></circle>
+              <circle cx="20" cy="21" r="1"></circle>
+              <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+            </svg>
+            <span>Add {{ quantity }} to Cart</span>
+          </button>
+
+          <button type="button" class="btn-buy-now" (click)="onBuyNow()">
+            Buy Now
+          </button>
+
+          <button
+            type="button"
+            class="btn-wishlist"
+            [class.wishlisted]="isWishlisted"
+            (click)="onToggleWishlist()"
+            [title]="isWishlisted ? 'Saved in Wishlist' : 'Save to Wishlist'"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              width="20"
+              height="20"
+              [attr.fill]="isWishlisted ? '#ef4444' : 'none'"
+              [attr.stroke]="isWishlisted ? '#ef4444' : 'currentColor'"
+              stroke-width="2"
+            >
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Key Features Highlights -->
+      <div class="features-box">
+        <h3 class="features-heading">Key Features & Highlights</h3>
+        <ul class="features-list">
+          <li *ngFor="let feat of product.features">
+            <span class="check-icon">✓</span>
+            <span>{{ feat }}</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Deep Dive Tabs: Description, Specs, Customer Reviews -->
+  <div class="tabs-container">
+    <div class="tab-headers">
+      <button
+        type="button"
+        class="tab-header-btn"
+        [class.active]="activeTab === 'description'"
+        (click)="activeTab = 'description'"
+      >
+        Description & Overview
+      </button>
+      <button
+        type="button"
+        class="tab-header-btn"
+        [class.active]="activeTab === 'specifications'"
+        (click)="activeTab = 'specifications'"
+      >
+        Technical Specifications
+      </button>
+      <button
+        type="button"
+        class="tab-header-btn"
+        [class.active]="activeTab === 'reviews'"
+        (click)="activeTab = 'reviews'"
+      >
+        Customer Reviews ({{ product.reviews.length }})
+      </button>
+    </div>
+
+    <div class="tab-body">
+      <!-- Description Tab -->
+      <div *ngIf="activeTab === 'description'" class="tab-pane">
+        <p class="full-description">{{ product.description }}</p>
+        <div class="tags-row" *ngIf="product.tags.length > 0">
+          <span class="tag-title">Product Tags:</span>
+          <span *ngFor="let tag of product.tags" class="filter-tag-pill">#{{ tag }}</span>
+        </div>
+      </div>
+
+      <!-- Specifications Tab -->
+      <div *ngIf="activeTab === 'specifications'" class="tab-pane">
+        <div class="specs-table-wrapper">
+          <table class="specs-table">
+            <tbody>
+              <tr *ngFor="let spec of specEntries">
+                <td class="spec-label">{{ spec[0] }}</td>
+                <td class="spec-value">{{ spec[1] }}</td>
+              </tr>
+              <tr>
+                <td class="spec-label">Seller Storefront</td>
+                <td class="spec-value">{{ product.seller.name }} ({{ product.seller.location }})</td>
+              </tr>
+              <tr>
+                <td class="spec-label">SKU Identifier</td>
+                <td class="spec-value">{{ product.sku }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Reviews Tab -->
+      <div *ngIf="activeTab === 'reviews'" class="tab-pane">
+        <div class="reviews-summary-card">
+          <div class="rating-big-score">
+            <span class="big-num">{{ product.rating }}</span>
+            <span class="big-out">out of 5</span>
+            <span class="big-stars">★★★★★</span>
+            <span class="big-total">Based on {{ product.reviewsCount }} reviews</span>
+          </div>
+
+          <div class="rating-bars">
+            <div class="bar-row" *ngFor="let star of [5, 4, 3, 2, 1]">
+              <span class="star-label">{{ star }} Star</span>
+              <div class="progress-track">
+                <div class="progress-fill" [style.width.%]="getRatingPercentage(star)"></div>
+              </div>
+              <span class="percentage-label">{{ getRatingPercentage(star) }}%</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Individual Reviews List -->
+        <div class="reviews-list">
+          <div *ngFor="let rev of product.reviews" class="review-item">
+            <div class="review-top">
+              <div class="user-meta">
+                <div class="avatar-circle">{{ rev.userName.charAt(0) }}</div>
+                <div>
+                  <h5 class="reviewer-name">{{ rev.userName }}</h5>
+                  <span *ngIf="rev.verifiedPurchase" class="verified-buyer-tag">✓ Verified Purchase</span>
+                </div>
+              </div>
+              <span class="review-date">{{ rev.date }}</span>
+            </div>
+            <div class="rev-stars">
+              <span *ngFor="let _ of [].constructor(rev.rating)">★</span>
+            </div>
+            <h6 class="review-title">{{ rev.title }}</h6>
+            <p class="review-comment">{{ rev.comment }}</p>
+            <div class="review-footer">
+              <span class="helpful-count">👍 {{ rev.helpfulCount }} people found this helpful</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Related Products Recommendations -->
+  <div class="related-section" *ngIf="relatedProducts.length > 0">
+    <div class="related-header">
+      <div>
+        <h3 class="related-title">Recommended from this Category & Seller</h3>
+        <p class="related-subtitle">Customers who viewed this item also considered</p>
+      </div>
+    </div>
+
+    <div class="related-grid">
+      <div
+        *ngFor="let item of relatedProducts"
+        class="mini-card"
+        (click)="onSelectRelated(item)"
+      >
+        <img [src]="item.imageUrl" [alt]="item.name" class="mini-card-img" />
+        <div class="mini-card-info">
+          <span class="mini-card-cat">{{ item.category }}</span>
+          <h5 class="mini-card-title">{{ item.name }}</h5>
+          <div class="mini-card-meta">
+            <span class="mini-card-price">${{ item.price | number: '1.2-2' }}</span>
+            <span class="mini-card-rating">★ {{ item.rating }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
