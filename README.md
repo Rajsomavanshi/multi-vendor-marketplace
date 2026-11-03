@@ -129,6 +129,20 @@ This project was developed collaboratively as a team project, with different mod
 - Product reviews and ratings
 - Advanced product search and filtering
 
+## 👨‍💻 Team Members
+
+This project was developed collaboratively by the following team members:
+
+| No. | Team Member | Responsibility |
+|:---:|---|---|
+| 1 | **Raj Somvanshi** | Admin Dashboard, Reports & Integration |
+| 2 | **Darshan Phopase** | User Authentication & Profile Management |
+| 3 | **Aditya Kadu** | Product Catalogue & Search |
+| 4 | **Jay Londhe** | Cart, Wishlist & Checkout |
+| 5 | **Pankaj Aher** | Seller Dashboard & Inventory |
+
+
+
 ---
 
 **⭐ If you find this project interesting, consider giving the repository a star!**
