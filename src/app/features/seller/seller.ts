@@ -1,7 +1,7 @@
 import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+
 import {
   OrderStatus,
   ProductFormData,
@@ -20,7 +20,7 @@ export interface ImagePreset {
 @Component({
   selector: 'app-seller',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule],
   styleUrl: './seller.css',
   templateUrl: './seller.html',
 })

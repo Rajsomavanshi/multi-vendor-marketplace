@@ -1,6 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
+import { RouterOutlet } from '@angular/router';
 
 import { Navbar } from './shared/components/navbar/navbar';
 import { ProductService } from './features/products/services/product.service';
@@ -11,8 +11,6 @@ import { ProductService } from './features/products/services/product.service';
   imports: [
     CommonModule,
     RouterOutlet,
-    RouterLink,
-    RouterLinkActive,
     Navbar
   ],
   templateUrl: './app.html',
