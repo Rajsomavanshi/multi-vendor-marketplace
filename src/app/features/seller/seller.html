@@ -1,36 +1,1190 @@
-<div class="demo-module-container">
-  <div class="module-card">
-    <div class="badge-role">Student 4 Module</div>
-    <h1>Seller Dashboard & Inventory</h1>
-    <p class="subtitle">Assigned to: Student 4</p>
+<div class="seller-module-root">
+  <!-- Toast Feedback Notification -->
+  @if (toastMessage()) {
+    <div class="toast-notification animate-slide-in">
+      <div class="toast-icon">✓</div>
+      <div class="toast-text">{{ toastMessage() }}</div>
+    </div>
+  }
 
-    <div class="seller-stat-cards">
-      <div class="stat-card">
-        <span class="stat-num">4</span>
-        <span class="stat-lbl">Active Multi-Vendors</span>
+  <!-- Header & Multi-Vendor Switcher -->
+  <header class="seller-header">
+    <div class="header-content">
+      <div class="header-titles">
+        <div class="student-badge">
+          <span class="badge-dot"></span>
+          Student 4: Seller Dashboard & Inventory
+        </div>
+        <h1 class="portal-title">Seller Hub & Inventory Management</h1>
+        <p class="portal-subtitle">
+          Manage your multi-vendor storefront, monitor real-time revenue, update stock levels, and fulfill customer orders.
+        </p>
       </div>
-      <div class="stat-card">
-        <span class="stat-num">8</span>
-        <span class="stat-lbl">Listed Products</span>
-      </div>
-      <div class="stat-card">
-        <span class="stat-num">100%</span>
-        <span class="stat-lbl">In-Stock Fulfillment</span>
+
+      <div class="header-actions">
+        <!-- Vendor Profile Selector -->
+        <div class="vendor-selector-card">
+          <span class="selector-lbl">Active Vendor View:</span>
+          <div class="selector-wrapper">
+            <select
+              [ngModel]="sellerService.activeSellerId()"
+              (ngModelChange)="onSellerChange($event)"
+              class="vendor-select"
+            >
+              <option value="all">🌐 All Multi-Vendors (Consolidated)</option>
+              @for (vendor of sellerService.availableSellers; track vendor.id) {
+                <option [value]="vendor.id">
+                  {{ vendor.name }} ({{ vendor.location }})
+                </option>
+              }
+            </select>
+          </div>
+          @if (sellerService.currentSeller(); as s) {
+            <div class="vendor-meta">
+              <span class="vendor-badge">{{ s.badge }}</span>
+              <span class="vendor-rating">★ {{ s.rating }}</span>
+              <span class="vendor-sales">{{ s.salesCount | number }} Lifetime Sales</span>
+            </div>
+          }
+        </div>
+
+        <!-- Quick Primary Action -->
+        <div class="cta-buttons">
+          <button type="button" class="btn btn-primary" (click)="openAddProductModal()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+            Add New Product
+          </button>
+          <button type="button" class="btn btn-secondary" (click)="resetDemo()" title="Reset to initial sample products & orders">
+            ⚡ Reset Demo Data
+          </button>
+        </div>
       </div>
     </div>
 
-    <div class="features-box">
-      <h3>Deliverables Checklist:</h3>
-      <ul>
-        <li>✓ Build seller dashboard summary cards</li>
-        <li>✓ Create product add/edit/delete forms and stock quantity management</li>
-        <li>✓ Show seller product and order tables with status labels</li>
-      </ul>
-    </div>
+    <!-- Navigation Tabs -->
+    <nav class="seller-tabs">
+      <button
+        type="button"
+        class="tab-btn"
+        [class.active]="activeTab === 'overview'"
+        (click)="setTab('overview')"
+      >
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="3" width="7" height="9"></rect>
+          <rect x="14" y="3" width="7" height="5"></rect>
+          <rect x="14" y="12" width="7" height="9"></rect>
+          <rect x="3" y="16" width="7" height="5"></rect>
+        </svg>
+        <span>Dashboard Overview</span>
+      </button>
 
-    <div class="demo-actions">
-      <a routerLink="/products" class="btn btn-primary">Go to Marketplace Storefront</a>
-      <a routerLink="/cart" class="btn btn-outline">Test Customer Cart & Orders</a>
+      <button
+        type="button"
+        class="tab-btn"
+        [class.active]="activeTab === 'inventory'"
+        (click)="setTab('inventory')"
+      >
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+          <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+          <line x1="12" y1="22.08" x2="12" y2="12"></line>
+        </svg>
+        <span>Product Inventory</span>
+        <span class="tab-pill">{{ sellerService.sellerProducts().length }}</span>
+      </button>
+
+      <button
+        type="button"
+        class="tab-btn"
+        [class.active]="activeTab === 'orders'"
+        (click)="setTab('orders')"
+      >
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+          <polyline points="14 2 14 8 20 8"></polyline>
+          <line x1="16" y1="13" x2="8" y2="13"></line>
+          <line x1="16" y1="17" x2="8" y2="17"></line>
+          <polyline points="10 9 9 9 8 9"></polyline>
+        </svg>
+        <span>Customer Orders</span>
+        <span class="tab-pill">{{ sellerService.sellerOrders().length }}</span>
+      </button>
+    </nav>
+  </header>
+
+  <!-- Main View Container -->
+  <main class="seller-body">
+    <!-- ============================================== -->
+    <!-- TAB 1: DASHBOARD OVERVIEW & SUMMARY CARDS      -->
+    <!-- ============================================== -->
+    @if (activeTab === 'overview') {
+      <div class="tab-pane overview-pane animate-slide-in">
+        <!-- Student 4: Deliverable 1 - Dashboard Summary Cards -->
+        <section class="summary-cards-grid">
+          <!-- Card 1: Total Revenue -->
+          <div class="stat-card revenue-card">
+            <div class="stat-icon-wrap bg-emerald">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="12" y1="1" x2="12" y2="23"></line>
+                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+              </svg>
+            </div>
+            <div class="stat-info">
+              <span class="stat-title">Gross Revenue</span>
+              <div class="stat-number-row">
+                <span class="stat-val">₹{{ sellerService.dashboardStats().totalRevenue | number }}</span>
+                <span class="stat-growth-tag positive">{{ sellerService.dashboardStats().revenueGrowth }}</span>
+              </div>
+              <span class="stat-sub">From active orders & sales</span>
+            </div>
+          </div>
+
+          <!-- Card 2: Total Orders -->
+          <div class="stat-card orders-card">
+            <div class="stat-icon-wrap bg-blue">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="9" cy="21" r="1"></circle>
+                <circle cx="20" cy="21" r="1"></circle>
+                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+              </svg>
+            </div>
+            <div class="stat-info">
+              <span class="stat-title">Total Orders</span>
+              <div class="stat-number-row">
+                <span class="stat-val">{{ sellerService.dashboardStats().totalOrders }}</span>
+                <span class="stat-growth-tag positive">{{ sellerService.dashboardStats().orderGrowth }}</span>
+              </div>
+              <div class="stat-order-pills">
+                <span class="order-mini-pill amber">{{ sellerService.dashboardStats().pendingOrders }} Pending</span>
+                <span class="order-mini-pill purple">{{ sellerService.dashboardStats().shippedOrders }} Shipped</span>
+                <span class="order-mini-pill emerald">{{ sellerService.dashboardStats().deliveredOrders }} Delivered</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 3: Products Listed -->
+          <div class="stat-card products-card">
+            <div class="stat-icon-wrap bg-indigo">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+              </svg>
+            </div>
+            <div class="stat-info">
+              <span class="stat-title">Catalog Inventory</span>
+              <div class="stat-number-row">
+                <span class="stat-val">{{ sellerService.dashboardStats().totalProducts }} Items</span>
+                <button type="button" class="btn-stat-link" (click)="setTab('inventory')">Manage →</button>
+              </div>
+              <span class="stat-sub">
+                {{ sellerService.dashboardStats().inStockCount }} In Stock •
+                <strong class="text-amber">{{ sellerService.dashboardStats().lowStockCount }} Low</strong> •
+                <strong class="text-rose">{{ sellerService.dashboardStats().outOfStockCount }} Out</strong>
+              </span>
+            </div>
+          </div>
+
+          <!-- Card 4: Fulfillment & Inventory Valuation -->
+          <div class="stat-card performance-card">
+            <div class="stat-icon-wrap bg-violet">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+              </svg>
+            </div>
+            <div class="stat-info">
+              <span class="stat-title">Fulfillment Health</span>
+              <div class="stat-number-row">
+                <span class="stat-val">{{ sellerService.dashboardStats().fulfillmentRate }}%</span>
+                <span class="stat-badge-grade">Top Seller</span>
+              </div>
+              <span class="stat-sub">
+                Valuation: ₹{{ sellerService.dashboardStats().totalInventoryValue | number }} ({{ sellerService.dashboardStats().totalInventoryUnits }} units in stock)
+              </span>
+            </div>
+          </div>
+        </section>
+
+        <!-- Stock Health Alert Banner (if any item is low or out of stock) -->
+        @if (lowStockProducts.length > 0) {
+          <section class="stock-alert-banner">
+            <div class="alert-icon-wrap">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                <line x1="12" y1="9" x2="12" y2="13"></line>
+                <line x1="12" y1="17" x2="12.01" y2="17"></line>
+              </svg>
+            </div>
+            <div class="alert-content">
+              <h4>Inventory Replenishment Notice</h4>
+              <p>
+                You have <strong>{{ lowStockProducts.length }} products</strong> with low stock (≤ 5) or out-of-stock. Restock now to prevent missed orders!
+              </p>
+              <div class="alert-chips-row">
+                @for (prod of lowStockProducts.slice(0, 3); track prod.id) {
+                  <div class="alert-product-chip">
+                    <img [src]="prod.imageUrl" [alt]="prod.name" class="chip-img" />
+                    <span class="chip-name">{{ prod.name | slice: 0: 24 }}...</span>
+                    <span [class]="'badge-status ' + getStockBadgeClass(prod.status)">
+                      {{ prod.stock }} left
+                    </span>
+                    <button type="button" class="btn-restock-sm" (click)="quickRestock(prod, 15)">
+                      +15 Restock
+                    </button>
+                  </div>
+                }
+              </div>
+            </div>
+            <button type="button" class="btn btn-outline-alert" (click)="setTab('inventory'); productStockFilter = 'Low Stock'">
+              View All Low Stock Items →
+            </button>
+          </section>
+        }
+
+        <!-- Split Grid: Recent Orders & Quick Inventory Status -->
+        <div class="dashboard-split-grid">
+          <!-- Recent Orders Snapshot -->
+          <div class="panel-card">
+            <div class="panel-header">
+              <div class="panel-title-wrap">
+                <h3>Recent Customer Orders</h3>
+                <span class="panel-count">{{ sellerService.sellerOrders().length }} Total</span>
+              </div>
+              <button type="button" class="panel-action-btn" (click)="setTab('orders')">
+                View All Orders →
+              </button>
+            </div>
+
+            <div class="panel-table-wrap">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Order #</th>
+                    <th>Customer</th>
+                    <th>Amount</th>
+                    <th>Status Label</th>
+                    <th>Change Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (order of sellerService.sellerOrders().slice(0, 5); track order.id) {
+                    <tr>
+                      <td class="cell-bold">
+                        <button type="button" class="link-order-id" (click)="openOrderDetails(order)">
+                          #{{ order.orderNumber }}
+                        </button>
+                      </td>
+                      <td>
+                        <div class="customer-info-cell">
+                          <span class="c-name">{{ order.customerName }}</span>
+                          <span class="c-city">{{ order.shippingCity }}</span>
+                        </div>
+                      </td>
+                      <td class="cell-price">₹{{ order.totalAmount | number }}</td>
+                      <td>
+                        <span [class]="'status-label ' + getOrderStatusBadgeClass(order.status)">
+                          {{ order.status }}
+                        </span>
+                      </td>
+                      <td>
+                        <select
+                          [ngModel]="order.status"
+                          (change)="onOrderStatusChange(order, $event)"
+                          class="status-dropdown-inline"
+                        >
+                          <option value="Confirmed">Confirmed</option>
+                          <option value="Processing">Processing</option>
+                          <option value="Shipped">Shipped</option>
+                          <option value="Delivered">Delivered</option>
+                          <option value="Cancelled">Cancelled</option>
+                        </select>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Inventory Quick Overview -->
+          <div class="panel-card">
+            <div class="panel-header">
+              <div class="panel-title-wrap">
+                <h3>Stock Status Highlights</h3>
+                <span class="panel-count">{{ sellerService.sellerProducts().length }} Listed</span>
+              </div>
+              <button type="button" class="panel-action-btn" (click)="openAddProductModal()">
+                + New Product
+              </button>
+            </div>
+
+            <div class="quick-inventory-list">
+              @for (prod of sellerService.sellerProducts().slice(0, 5); track prod.id) {
+                <div class="quick-inv-item">
+                  <img [src]="prod.imageUrl" [alt]="prod.name" class="quick-inv-img" />
+                  <div class="quick-inv-details">
+                    <span class="quick-inv-name" [title]="prod.name">{{ prod.name }}</span>
+                    <span class="quick-inv-meta">{{ prod.category }} • SKU: {{ prod.sku }}</span>
+                  </div>
+                  <div class="quick-inv-stock">
+                    <span [class]="'status-label ' + getStockBadgeClass(prod.status)">
+                      {{ prod.status }} ({{ prod.stock }})
+                    </span>
+                  </div>
+                  <div class="quick-inv-btns">
+                    <button type="button" class="btn-icon" (click)="decrementStock(prod)" title="Reduce stock by 1">−</button>
+                    <button type="button" class="btn-icon" (click)="incrementStock(prod)" title="Increase stock by 1">+</button>
+                    <button type="button" class="btn-chip-restock" (click)="quickRestock(prod, 10)">+10</button>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- ============================================== -->
+    <!-- TAB 2: PRODUCT INVENTORY & STOCK MANAGEMENT    -->
+    <!-- ============================================== -->
+    @if (activeTab === 'inventory') {
+      <div class="tab-pane inventory-pane animate-slide-in">
+        <!-- Student 4: Deliverable 2 & 3 - Product Add/Edit/Delete Forms & Stock Quantity Management & Tables -->
+        <div class="table-card">
+          <!-- Toolbar Controls -->
+          <div class="table-toolbar">
+            <div class="toolbar-search">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+              <input
+                type="text"
+                placeholder="Search products by title, SKU, brand, category..."
+                [(ngModel)]="productSearchQuery"
+                class="search-input"
+              />
+              @if (productSearchQuery) {
+                <button type="button" class="btn-clear" (click)="productSearchQuery = ''">✕</button>
+              }
+            </div>
+
+            <div class="toolbar-filters">
+              <!-- Category Filter -->
+              <div class="filter-group">
+                <label>Category:</label>
+                <select [(ngModel)]="productCategoryFilter" class="filter-select">
+                  @for (cat of sellerService.categories(); track cat) {
+                    <option [value]="cat">{{ cat }}</option>
+                  }
+                </select>
+              </div>
+
+              <!-- Stock Status Filter -->
+              <div class="filter-group">
+                <label>Stock Status:</label>
+                <select [(ngModel)]="productStockFilter" class="filter-select">
+                  <option value="All">All Statuses</option>
+                  <option value="In Stock">In Stock (>5 units)</option>
+                  <option value="Low Stock">Low Stock (1-5 units)</option>
+                  <option value="Out of Stock">Out of Stock (0 units)</option>
+                </select>
+              </div>
+
+              <!-- Sort Option -->
+              <div class="filter-group">
+                <label>Sort By:</label>
+                <select [(ngModel)]="productSortBy" class="filter-select">
+                  <option value="name-asc">Product Name (A-Z)</option>
+                  <option value="price-asc">Price (Low to High)</option>
+                  <option value="price-desc">Price (High to Low)</option>
+                  <option value="stock-asc">Stock (Low to High)</option>
+                  <option value="stock-desc">Stock (High to Low)</option>
+                </select>
+              </div>
+
+              <!-- Add Product CTA -->
+              <button type="button" class="btn btn-primary btn-sm" (click)="openAddProductModal()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="12" y1="5" x2="12" y2="19"></line>
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                Add Product
+              </button>
+            </div>
+          </div>
+
+          <!-- Product Table with Status Labels and Stock Quantity Management -->
+          <div class="table-responsive">
+            <table class="data-table main-product-table">
+              <thead>
+                <tr>
+                  <th style="width: 32%;">Product & SKU</th>
+                  <th style="width: 14%;">Category</th>
+                  <th style="width: 14%;">Price</th>
+                  <th style="width: 18%;">Stock Quantity & Controls</th>
+                  <th style="width: 11%;">Status Label</th>
+                  <th style="width: 11%; text-align: right;">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                @if (filteredProducts.length === 0) {
+                  <tr>
+                    <td colspan="6" class="empty-table-cell">
+                      <div class="empty-state">
+                        <span class="empty-icon">📦</span>
+                        <h3>No products found</h3>
+                        <p>No products match your current search query or filter criteria.</p>
+                        <button type="button" class="btn btn-secondary btn-sm" (click)="productSearchQuery = ''; productCategoryFilter = 'All'; productStockFilter = 'All'">
+                          Clear Filters
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                }
+
+                @for (prod of filteredProducts; track prod.id) {
+                  <tr class="product-row" [class.row-out-of-stock]="prod.stock === 0">
+                    <!-- Product Info -->
+                    <td>
+                      <div class="product-cell-wrap">
+                        <img [src]="prod.imageUrl" [alt]="prod.name" class="product-thumb" />
+                        <div class="product-cell-text">
+                          <span class="product-table-name" [title]="prod.name">{{ prod.name }}</span>
+                          <div class="product-meta-sub">
+                            <span class="sku-badge">{{ prod.sku }}</span>
+                            @if (prod.brand) {
+                              <span class="brand-tag">{{ prod.brand }}</span>
+                            }
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+
+                    <!-- Category -->
+                    <td>
+                      <span class="category-pill">{{ prod.category }}</span>
+                    </td>
+
+                    <!-- Price -->
+                    <td>
+                      <div class="price-cell-wrap">
+                        <span class="current-price">₹{{ prod.price | number }}</span>
+                        @if (prod.originalPrice && prod.originalPrice > prod.price) {
+                          <span class="orig-price">₹{{ prod.originalPrice | number }}</span>
+                        }
+                      </div>
+                    </td>
+
+                    <!-- Stock Quantity Management Controls (Deliverable 2) -->
+                    <td>
+                      <div class="stock-manager-cell">
+                        <div class="stock-controls-box">
+                          <button
+                            type="button"
+                            class="stock-btn decrement-btn"
+                            (click)="decrementStock(prod)"
+                            [disabled]="prod.stock === 0"
+                            title="Decrement stock by 1"
+                          >
+                            −
+                          </button>
+
+                          <input
+                            type="number"
+                            [value]="prod.stock"
+                            (blur)="onStockInputBlur(prod, $event)"
+                            class="stock-number-input"
+                            min="0"
+                            title="Direct edit stock count"
+                          />
+
+                          <button
+                            type="button"
+                            class="stock-btn increment-btn"
+                            (click)="incrementStock(prod)"
+                            title="Increment stock by 1"
+                          >
+                            +
+                          </button>
+                        </div>
+
+                        <!-- Quick Restock Presets -->
+                        <div class="restock-chips-row">
+                          <button type="button" class="restock-chip" (click)="quickRestock(prod, 5)">+5</button>
+                          <button type="button" class="restock-chip" (click)="quickRestock(prod, 10)">+10</button>
+                          <button type="button" class="restock-chip" (click)="quickRestock(prod, 25)">+25</button>
+                        </div>
+                      </div>
+                    </td>
+
+                    <!-- Status Label Badge (Deliverable 3) -->
+                    <td>
+                      <span [class]="'status-label ' + getStockBadgeClass(prod.status)">
+                        <span class="label-dot"></span>
+                        {{ prod.status }}
+                      </span>
+                    </td>
+
+                    <!-- Actions (Add/Edit/Delete Forms) -->
+                    <td style="text-align: right;">
+                      <div class="action-buttons-cell">
+                        <button
+                          type="button"
+                          class="btn-action edit-btn"
+                          (click)="openEditProductModal(prod)"
+                          title="Edit product details"
+                        >
+                          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                          </svg>
+                          Edit
+                        </button>
+
+                        <button
+                          type="button"
+                          class="btn-action delete-btn"
+                          (click)="openDeleteModal(prod)"
+                          title="Delete product"
+                        >
+                          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="3 6 5 6 21 6"></polyline>
+                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                          </svg>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Table Footer Summary -->
+          <div class="table-footer">
+            <span class="footer-count">Showing {{ filteredProducts.length }} of {{ sellerService.sellerProducts().length }} listed products</span>
+            <div class="footer-metrics">
+              <span class="footer-metric">Total In-Stock Units: <strong>{{ sellerService.dashboardStats().totalInventoryUnits }}</strong></span>
+              <span class="footer-metric">Total Inventory Worth: <strong>₹{{ sellerService.dashboardStats().totalInventoryValue | number }}</strong></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- ============================================== -->
+    <!-- TAB 3: CUSTOMER ORDERS WITH STATUS LABELS      -->
+    <!-- ============================================== -->
+    @if (activeTab === 'orders') {
+      <div class="tab-pane orders-pane animate-slide-in">
+        <!-- Student 4: Deliverable 3 - Seller Order Tables with Status Labels -->
+        <div class="table-card">
+          <!-- Order Filter Bar -->
+          <div class="table-toolbar">
+            <div class="toolbar-search">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+              <input
+                type="text"
+                placeholder="Search orders by Order #, customer name, email, city, product..."
+                [(ngModel)]="orderSearchQuery"
+                class="search-input"
+              />
+              @if (orderSearchQuery) {
+                <button type="button" class="btn-clear" (click)="orderSearchQuery = ''">✕</button>
+              }
+            </div>
+
+            <!-- Status Filter Pills -->
+            <div class="order-status-tabs">
+              <button
+                type="button"
+                class="status-pill-btn"
+                [class.active]="orderStatusFilter === 'All'"
+                (click)="orderStatusFilter = 'All'"
+              >
+                All ({{ sellerService.sellerOrders().length }})
+              </button>
+              <button
+                type="button"
+                class="status-pill-btn"
+                [class.active]="orderStatusFilter === 'Confirmed'"
+                (click)="orderStatusFilter = 'Confirmed'"
+              >
+                Confirmed
+              </button>
+              <button
+                type="button"
+                class="status-pill-btn"
+                [class.active]="orderStatusFilter === 'Processing'"
+                (click)="orderStatusFilter = 'Processing'"
+              >
+                Processing
+              </button>
+              <button
+                type="button"
+                class="status-pill-btn"
+                [class.active]="orderStatusFilter === 'Shipped'"
+                (click)="orderStatusFilter = 'Shipped'"
+              >
+                Shipped
+              </button>
+              <button
+                type="button"
+                class="status-pill-btn"
+                [class.active]="orderStatusFilter === 'Delivered'"
+                (click)="orderStatusFilter = 'Delivered'"
+              >
+                Delivered
+              </button>
+              <button
+                type="button"
+                class="status-pill-btn"
+                [class.active]="orderStatusFilter === 'Cancelled'"
+                (click)="orderStatusFilter = 'Cancelled'"
+              >
+                Cancelled
+              </button>
+            </div>
+          </div>
+
+          <!-- Orders Table with Status Labels & Update Action -->
+          <div class="table-responsive">
+            <table class="data-table orders-main-table">
+              <thead>
+                <tr>
+                  <th style="width: 18%;">Order Number & Date</th>
+                  <th style="width: 20%;">Customer Info</th>
+                  <th style="width: 24%;">Items Ordered</th>
+                  <th style="width: 14%;">Amount & Payment</th>
+                  <th style="width: 14%;">Order Status Label</th>
+                  <th style="width: 10%; text-align: right;">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                @if (filteredOrders.length === 0) {
+                  <tr>
+                    <td colspan="6" class="empty-table-cell">
+                      <div class="empty-state">
+                        <span class="empty-icon">📑</span>
+                        <h3>No orders found</h3>
+                        <p>No orders match the selected status or search query.</p>
+                        <button type="button" class="btn btn-secondary btn-sm" (click)="orderSearchQuery = ''; orderStatusFilter = 'All'">
+                          Show All Orders
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                }
+
+                @for (order of filteredOrders; track order.id) {
+                  <tr class="order-row">
+                    <!-- Order ID & Date -->
+                    <td>
+                      <div class="order-id-cell">
+                        <span class="order-number-text">#{{ order.orderNumber }}</span>
+                        <span class="order-date-text">{{ order.createdAt | date: 'mediumDate' }}</span>
+                        @if (order.trackingNumber) {
+                          <span class="tracking-tag">{{ order.trackingNumber }}</span>
+                        }
+                      </div>
+                    </td>
+
+                    <!-- Customer Info -->
+                    <td>
+                      <div class="customer-info-box">
+                        <span class="customer-name-bold">{{ order.customerName }}</span>
+                        <span class="customer-contact">{{ order.customerEmail }}</span>
+                        <span class="customer-location">{{ order.shippingCity }}</span>
+                      </div>
+                    </td>
+
+                    <!-- Items Ordered Preview -->
+                    <td>
+                      <div class="order-items-cell">
+                        <div class="items-thumb-stack">
+                          @for (item of order.items.slice(0, 3); track item.productId) {
+                            <img [src]="item.imageUrl" [alt]="item.productName" class="order-item-thumb" [title]="item.productName + ' (' + item.quantity + 'x)'" />
+                          }
+                          @if (order.items.length > 3) {
+                            <span class="more-items-pill">+{{ order.items.length - 3 }}</span>
+                          }
+                        </div>
+                        <div class="items-desc-text">
+                          <span class="item-primary-name">{{ order.items[0].productName | slice: 0: 32 }}...</span>
+                          <span class="items-count-tag">{{ order.itemCount }} total item{{ order.itemCount > 1 ? 's' : '' }}</span>
+                        </div>
+                      </div>
+                    </td>
+
+                    <!-- Amount & Payment -->
+                    <td>
+                      <div class="order-amount-box">
+                        <span class="order-grand-total">₹{{ order.totalAmount | number }}</span>
+                        <div class="payment-method-row">
+                          <span class="pay-method-badge">{{ order.paymentMethod }}</span>
+                          <span [class]="order.paymentStatus === 'Paid' ? 'pay-paid' : 'pay-cod'">
+                            {{ order.paymentStatus }}
+                          </span>
+                        </div>
+                      </div>
+                    </td>
+
+                    <!-- Order Status Label with Inline Quick Updater (Deliverable 3) -->
+                    <td>
+                      <div class="order-status-cell">
+                        <span [class]="'status-label ' + getOrderStatusBadgeClass(order.status)">
+                          <span class="label-dot"></span>
+                          {{ order.status }}
+                        </span>
+
+                        <select
+                          [ngModel]="order.status"
+                          (change)="onOrderStatusChange(order, $event)"
+                          class="status-dropdown-select"
+                        >
+                          <option value="Confirmed">Confirmed</option>
+                          <option value="Processing">Processing</option>
+                          <option value="Shipped">Shipped</option>
+                          <option value="Delivered">Delivered</option>
+                          <option value="Cancelled">Cancelled</option>
+                        </select>
+                      </div>
+                    </td>
+
+                    <!-- Actions -->
+                    <td style="text-align: right;">
+                      <button
+                        type="button"
+                        class="btn-action view-btn"
+                        (click)="openOrderDetails(order)"
+                        title="View full order details & packing slip"
+                      >
+                        Details
+                      </button>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <div class="table-footer">
+            <span class="footer-count">Showing {{ filteredOrders.length }} customer orders</span>
+            <span class="footer-metric">Total Fulfilled Orders: <strong>{{ sellerService.dashboardStats().deliveredOrders }}</strong></span>
+          </div>
+        </div>
+      </div>
+    }
+  </main>
+
+  <!-- ============================================== -->
+  <!-- MODAL 1: ADD / EDIT PRODUCT FORM MODAL         -->
+  <!-- ============================================== -->
+  @if (isProductModalOpen) {
+    <div class="modal-backdrop" (click)="closeProductModal()">
+      <div class="modal-card animate-slide-in" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <div class="modal-title-wrap">
+            <div class="modal-icon-badge">
+              {{ modalMode === 'add' ? '➕' : '✏️' }}
+            </div>
+            <div>
+              <h3>{{ modalMode === 'add' ? 'Add New Product to Storefront' : 'Edit Product Details' }}</h3>
+              <p class="modal-sub">
+                {{ modalMode === 'add' ? 'Fill out the details below to list a new item on the multi-vendor marketplace.' : 'Update pricing, inventory stock quantities, and descriptions.' }}
+              </p>
+            </div>
+          </div>
+          <button type="button" class="btn-modal-close" (click)="closeProductModal()">✕</button>
+        </div>
+
+        <form class="modal-form" (ngSubmit)="saveProduct()">
+          <div class="form-grid">
+            <!-- Product Title -->
+            <div class="form-group full-width">
+              <label for="prodName">Product Title <span class="required">*</span></label>
+              <input
+                id="prodName"
+                type="text"
+                placeholder="e.g. Wireless Ergonomic Mechanical Keyboard"
+                [(ngModel)]="productForm.name"
+                name="name"
+                class="form-input"
+                [class.input-error]="formErrors['name']"
+              />
+              @if (formErrors['name']) {
+                <span class="error-msg">{{ formErrors['name'] }}</span>
+              }
+            </div>
+
+            <!-- Category -->
+            <div class="form-group">
+              <label for="prodCategory">Category <span class="required">*</span></label>
+              <select
+                id="prodCategory"
+                [(ngModel)]="productForm.category"
+                name="category"
+                class="form-select"
+                [class.input-error]="formErrors['category']"
+              >
+                <option value="Electronics">Electronics</option>
+                <option value="Audio">Audio</option>
+                <option value="Fashion">Fashion</option>
+                <option value="Home & Kitchen">Home & Kitchen</option>
+                <option value="Wearables">Wearables</option>
+                <option value="Sports & Fitness">Sports & Fitness</option>
+                <option value="Books">Books</option>
+              </select>
+              @if (formErrors['category']) {
+                <span class="error-msg">{{ formErrors['category'] }}</span>
+              }
+            </div>
+
+            <!-- SKU -->
+            <div class="form-group">
+              <label for="prodSku">SKU (Stock Keeping Unit)</label>
+              <input
+                id="prodSku"
+                type="text"
+                placeholder="e.g. ELE-KEY-99 (auto-generated if blank)"
+                [(ngModel)]="productForm.sku"
+                name="sku"
+                class="form-input"
+              />
+            </div>
+
+            <!-- Price -->
+            <div class="form-group">
+              <label for="prodPrice">Selling Price (₹) <span class="required">*</span></label>
+              <input
+                id="prodPrice"
+                type="number"
+                placeholder="e.g. 2499"
+                [(ngModel)]="productForm.price"
+                name="price"
+                min="1"
+                class="form-input"
+                [class.input-error]="formErrors['price']"
+              />
+              @if (formErrors['price']) {
+                <span class="error-msg">{{ formErrors['price'] }}</span>
+              }
+            </div>
+
+            <!-- Original Price / MRP -->
+            <div class="form-group">
+              <label for="prodOrigPrice">Original MRP (₹)</label>
+              <input
+                id="prodOrigPrice"
+                type="number"
+                placeholder="e.g. 3499"
+                [(ngModel)]="productForm.originalPrice"
+                name="originalPrice"
+                min="1"
+                class="form-input"
+                [class.input-error]="formErrors['originalPrice']"
+              />
+              @if (formErrors['originalPrice']) {
+                <span class="error-msg">{{ formErrors['originalPrice'] }}</span>
+              }
+            </div>
+
+            <!-- Initial Stock Quantity -->
+            <div class="form-group">
+              <label for="prodStock">Stock Quantity <span class="required">*</span></label>
+              <div class="stock-input-wrap">
+                <input
+                  id="prodStock"
+                  type="number"
+                  placeholder="e.g. 25"
+                  [(ngModel)]="productForm.stock"
+                  name="stock"
+                  min="0"
+                  class="form-input"
+                  [class.input-error]="formErrors['stock']"
+                />
+                <span class="stock-status-hint">
+                  Status: <strong>{{ sellerService.determineStockStatus(productForm.stock) }}</strong>
+                </span>
+              </div>
+              @if (formErrors['stock']) {
+                <span class="error-msg">{{ formErrors['stock'] }}</span>
+              }
+            </div>
+
+            <!-- Brand Name -->
+            <div class="form-group">
+              <label for="prodBrand">Brand / Manufacturer</label>
+              <input
+                id="prodBrand"
+                type="text"
+                placeholder="e.g. Apex Tech"
+                [(ngModel)]="productForm.brand"
+                name="brand"
+                class="form-input"
+              />
+            </div>
+
+            <!-- Tagline -->
+            <div class="form-group full-width">
+              <label for="prodTagline">Product Tagline / Catchphrase</label>
+              <input
+                id="prodTagline"
+                type="text"
+                placeholder="e.g. Engineered for whisper-quiet keystrokes and ultra-fast gaming."
+                [(ngModel)]="productForm.tagline"
+                name="tagline"
+                class="form-input"
+              />
+            </div>
+
+            <!-- Image URL -->
+            <div class="form-group full-width">
+              <label for="prodImg">Image URL <span class="required">*</span></label>
+              <input
+                id="prodImg"
+                type="url"
+                placeholder="https://images.unsplash.com/photo-..."
+                [(ngModel)]="productForm.imageUrl"
+                name="imageUrl"
+                class="form-input"
+                [class.input-error]="formErrors['imageUrl']"
+              />
+              @if (formErrors['imageUrl']) {
+                <span class="error-msg">{{ formErrors['imageUrl'] }}</span>
+              }
+
+              <!-- Image Quick Pick Presets -->
+              <div class="presets-section">
+                <span class="presets-label">Or choose a demo preset:</span>
+                <div class="presets-row">
+                  @for (preset of imagePresets; track preset.label) {
+                    <button
+                      type="button"
+                      class="preset-chip"
+                      [class.active]="productForm.imageUrl === preset.url"
+                      (click)="selectPresetImage(preset.url, preset.category)"
+                    >
+                      <img [src]="preset.url" [alt]="preset.label" class="preset-thumb" />
+                      <span>{{ preset.label }}</span>
+                    </button>
+                  }
+                </div>
+              </div>
+
+              <!-- Live Preview -->
+              @if (productForm.imageUrl) {
+                <div class="img-preview-box">
+                  <span class="preview-lbl">Live Image Preview:</span>
+                  <img [src]="productForm.imageUrl" alt="Preview" class="preview-img" />
+                </div>
+              }
+            </div>
+
+            <!-- Description -->
+            <div class="form-group full-width">
+              <label for="prodDesc">Full Description</label>
+              <textarea
+                id="prodDesc"
+                rows="3"
+                placeholder="Provide detailed specs, materials, and warranty information for customers..."
+                [(ngModel)]="productForm.description"
+                name="description"
+                class="form-textarea"
+              ></textarea>
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" (click)="closeProductModal()">
+              Cancel
+            </button>
+            <button type="submit" class="btn btn-primary">
+              {{ modalMode === 'add' ? 'Publish Product to Store' : 'Save Changes' }}
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
-  </div>
+  }
+
+  <!-- ============================================== -->
+  <!-- MODAL 2: DELETE CONFIRMATION MODAL             -->
+  <!-- ============================================== -->
+  @if (isDeleteModalOpen && deletingProduct) {
+    <div class="modal-backdrop" (click)="closeDeleteModal()">
+      <div class="modal-card modal-sm animate-slide-in" (click)="$event.stopPropagation()">
+        <div class="delete-modal-content">
+          <div class="delete-icon-wrap">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+              <line x1="12" y1="9" x2="12" y2="13"></line>
+              <line x1="12" y1="17" x2="12.01" y2="17"></line>
+            </svg>
+          </div>
+          <h3>Confirm Product Deletion</h3>
+          <p>
+            Are you sure you want to remove <strong>"{{ deletingProduct.name }}"</strong>? This product will be deleted from your seller inventory and will no longer be visible to marketplace customers.
+          </p>
+
+          <div class="delete-prod-preview">
+            <img [src]="deletingProduct.imageUrl" [alt]="deletingProduct.name" class="del-thumb" />
+            <div>
+              <span class="del-name">{{ deletingProduct.name }}</span>
+              <span class="del-meta">SKU: {{ deletingProduct.sku }} • ₹{{ deletingProduct.price | number }}</span>
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" (click)="closeDeleteModal()">
+              Keep Product
+            </button>
+            <button type="button" class="btn btn-danger" (click)="confirmDelete()">
+              Yes, Delete Product
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- ============================================== -->
+  <!-- MODAL 3: ORDER DETAILS MODAL                   -->
+  <!-- ============================================== -->
+  @if (isOrderDetailsModalOpen && selectedOrder) {
+    <div class="modal-backdrop" (click)="closeOrderDetails()">
+      <div class="modal-card modal-lg animate-slide-in" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <div class="modal-title-wrap">
+            <div class="modal-icon-badge">📑</div>
+            <div>
+              <h3>Order Details: #{{ selectedOrder.orderNumber }}</h3>
+              <p class="modal-sub">
+                Placed on {{ selectedOrder.createdAt | date: 'medium' }}
+              </p>
+            </div>
+          </div>
+          <button type="button" class="btn-modal-close" (click)="closeOrderDetails()">✕</button>
+        </div>
+
+        <div class="order-details-body">
+          <!-- Status Action Bar -->
+          <div class="order-action-bar">
+            <div class="order-status-current">
+              <span class="lbl">Current Status:</span>
+              <span [class]="'status-label ' + getOrderStatusBadgeClass(selectedOrder.status)">
+                <span class="label-dot"></span>
+                {{ selectedOrder.status }}
+              </span>
+            </div>
+            <div class="order-status-triggers">
+              <span class="lbl">Transition Status:</span>
+              <button
+                type="button"
+                class="btn-status-chip btn-status-processing"
+                (click)="updateSelectedOrderStatus('Processing')"
+              >
+                Mark Processing
+              </button>
+              <button
+                type="button"
+                class="btn-status-chip btn-status-shipped"
+                (click)="updateSelectedOrderStatus('Shipped')"
+              >
+                Mark Shipped
+              </button>
+              <button
+                type="button"
+                class="btn-status-chip btn-status-delivered"
+                (click)="updateSelectedOrderStatus('Delivered')"
+              >
+                Mark Delivered
+              </button>
+              <button
+                type="button"
+                class="btn-status-chip btn-status-cancelled"
+                (click)="updateSelectedOrderStatus('Cancelled')"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+
+          <!-- Customer & Shipping Grid -->
+          <div class="order-info-grid">
+            <div class="info-card">
+              <h4>Customer Information</h4>
+              <p><strong>{{ selectedOrder.customerName }}</strong></p>
+              <p>📧 {{ selectedOrder.customerEmail }}</p>
+              <p>📞 {{ selectedOrder.customerPhone }}</p>
+            </div>
+
+            <div class="info-card">
+              <h4>Shipping Destination</h4>
+              <p>{{ selectedOrder.shippingAddress }}</p>
+              <p><strong>{{ selectedOrder.shippingCity }}</strong></p>
+              @if (selectedOrder.trackingNumber) {
+                <p class="tracking-p">Tracking ID: <code>{{ selectedOrder.trackingNumber }}</code></p>
+              }
+            </div>
+
+            <div class="info-card">
+              <h4>Payment & Billing</h4>
+              <p>Payment Method: <strong>{{ selectedOrder.paymentMethod }}</strong></p>
+              <p>
+                Status:
+                <span [class]="selectedOrder.paymentStatus === 'Paid' ? 'pay-paid' : 'pay-cod'">
+                  {{ selectedOrder.paymentStatus }}
+                </span>
+              </p>
+              <p class="order-total-big">Total Amount: <strong>₹{{ selectedOrder.totalAmount | number }}</strong></p>
+            </div>
+          </div>
+
+          <!-- Line Items Table -->
+          <div class="order-items-table-wrap">
+            <h4>Ordered Marketplace Products</h4>
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Product Item</th>
+                  <th>SKU</th>
+                  <th>Unit Price</th>
+                  <th>Quantity</th>
+                  <th style="text-align: right;">Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (item of selectedOrder.items; track item.productId) {
+                  <tr>
+                    <td>
+                      <div class="order-item-line">
+                        <img [src]="item.imageUrl" [alt]="item.productName" class="line-item-thumb" />
+                        <span class="line-item-name">{{ item.productName }}</span>
+                      </div>
+                    </td>
+                    <td><code>{{ item.sku }}</code></td>
+                    <td>₹{{ item.price | number }}</td>
+                    <td><strong>{{ item.quantity }}x</strong></td>
+                    <td style="text-align: right;" class="cell-bold">₹{{ item.total | number }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="closeOrderDetails()">
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  }
 </div>
