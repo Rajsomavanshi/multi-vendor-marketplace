@@ -1,36 +1,112 @@
-<div class="demo-module-container">
-  <div class="module-card">
-    <div class="badge-role">Student 5 Module</div>
-    <h1>Admin Dashboard, Reports & Integration</h1>
-    <p class="subtitle">Assigned to: Student 5</p>
-
-    <div class="admin-stat-cards">
-      <div class="stat-card">
-        <span class="stat-num">5</span>
-        <span class="stat-lbl">Integrated Modules</span>
-      </div>
-      <div class="stat-card">
-        <span class="stat-num">1</span>
-        <span class="stat-lbl">Unified Angular App</span>
-      </div>
-      <div class="stat-card">
-        <span class="stat-num">100%</span>
-        <span class="stat-lbl">Shared State Ready</span>
-      </div>
+<div class="admin-container">
+  <!-- Admin Navigation Bar -->
+  <div class="admin-nav-bar">
+    <div class="admin-nav-brand">
+      <span class="badge-role">Operations Suite</span>
+      <h2>Admin Control Center</h2>
     </div>
 
-    <div class="features-box">
-      <h3>Deliverables Checklist:</h3>
-      <ul>
-        <li>✓ Build admin overview with users, sellers, products, and order summaries</li>
-        <li>✓ Create basic reports and order-status views</li>
-        <li>✓ Integrate all modules, navigation, shared services, and consistent styling</li>
-      </ul>
+    <div class="admin-tabs">
+      <button
+        type="button"
+        class="admin-tab-btn"
+        [class.active]="activeTab() === 'reports'"
+        (click)="setTab('reports')"
+      >
+        📊 Reports & Analytics
+      </button>
+
+      <button
+        type="button"
+        class="admin-tab-btn"
+        [class.active]="activeTab() === 'users'"
+        (click)="setTab('users')"
+      >
+        👥 User Management
+      </button>
+
+      <button
+        type="button"
+        class="admin-tab-btn"
+        [class.active]="activeTab() === 'orders'"
+        (click)="setTab('orders')"
+      >
+        📦 Order Management
+      </button>
+
+      <button
+        type="button"
+        class="admin-tab-btn"
+        [class.active]="activeTab() === 'dashboard'"
+        (click)="setTab('dashboard')"
+      >
+        📈 Dashboard
+      </button>
+
+      <button
+        type="button"
+        class="admin-tab-btn"
+        [class.active]="activeTab() === 'overview'"
+        (click)="setTab('overview')"
+      >
+        📋 System Overview
+      </button>
+    </div>
+  </div>
+
+  <!-- Admin Views -->
+  <div class="admin-view-content">
+    <div *ngIf="activeTab() === 'reports'">
+      <app-reports></app-reports>
     </div>
 
-    <div class="demo-actions">
-      <a routerLink="/products" class="btn btn-primary">Go to Products View</a>
-      <a routerLink="/cart" class="btn btn-outline">Go to Cart & Checkout (Student 3)</a>
+    <div *ngIf="activeTab() === 'users'">
+      <app-user-management></app-user-management>
+    </div>
+
+    <div *ngIf="activeTab() === 'orders'">
+      <app-order-management></app-order-management>
+    </div>
+
+    <div *ngIf="activeTab() === 'dashboard'">
+      <app-dashboard></app-dashboard>
+    </div>
+
+    <div *ngIf="activeTab() === 'overview'" class="demo-module-container">
+      <div class="module-card">
+        <div class="badge-role">Operations Suite</div>
+        <h1>Admin Dashboard, Reports & Integration</h1>
+        <p class="subtitle">Platform Governance & Operational Metrics</p>
+
+        <div class="admin-stat-cards">
+          <div class="stat-card">
+            <span class="stat-num">5</span>
+            <span class="stat-lbl">Integrated Modules</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-num">1</span>
+            <span class="stat-lbl">Unified Angular App</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-num">100%</span>
+            <span class="stat-lbl">Shared State Ready</span>
+          </div>
+        </div>
+
+        <div class="features-box">
+          <h3>Deliverables Checklist:</h3>
+          <ul>
+            <li>✓ Build admin overview with users, sellers, products, and order summaries</li>
+            <li>✓ Create basic reports and order-status views</li>
+            <li>✓ Integrate all modules, navigation, shared services, and consistent styling</li>
+          </ul>
+        </div>
+
+        <div class="demo-actions">
+          <a routerLink="/products" class="btn btn-primary">Go to Products View</a>
+          <a routerLink="/cart" class="btn btn-outline">Go to Cart & Checkout</a>
+        </div>
+      </div>
     </div>
   </div>
 </div>

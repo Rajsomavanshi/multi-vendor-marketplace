@@ -1,8 +1,16 @@
+:host {
+    display: block;
+    width: 100%;
+    color: #0f172a;
+    font-family: 'Plus Jakarta Sans', 'Inter', Arial, sans-serif;
+}
+
 .dashboard {
     padding: 30px;
     background: #f5f7fb;
     min-height: 100vh;
-    font-family: Arial, sans-serif;
+    color: #0f172a;
+    box-sizing: border-box;
 }
 
 .topbar {
@@ -16,23 +24,31 @@
     margin: 0;
     color: #172554;
     font-size: 28px;
+    font-weight: 700;
 }
 
 .topbar p {
     color: #64748b;
+    margin: 6px 0 0 0;
 }
 
 .admin-profile {
     display: flex;
     align-items: center;
     gap: 12px;
-    background: white;
+    background: #ffffff;
     padding: 12px 18px;
     border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    color: #0f172a;
 }
 
 .admin-profile span {
     font-size: 28px;
+}
+
+.admin-profile strong {
+    color: #0f172a;
 }
 
 .admin-profile small {
@@ -49,10 +65,12 @@
 }
 
 .stat-card {
-    background: white;
+    background: #ffffff;
     padding: 22px;
     border-radius: 14px;
-    box-shadow: 0 3px 15px #00000008;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    color: #0f172a;
 }
 
 .stat-icon {
@@ -61,22 +79,30 @@
 
 .stat-card p {
     color: #64748b;
+    font-size: 13px;
+    font-weight: 600;
+    margin: 8px 0;
 }
 
 .stat-card h2 {
     color: #172554;
-    font-size: 25px;
+    font-size: 28px;
+    font-weight: 700;
+    margin: 0 0 8px 0;
 }
 
 .change {
     color: #16a34a;
     font-size: 13px;
+    font-weight: 600;
 }
 
 .orders-section {
-    background: white;
+    background: #ffffff;
     padding: 25px;
     border-radius: 14px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
 .section-heading {
@@ -85,17 +111,25 @@
     align-items: center;
 }
 
+.section-heading h2 {
+    color: #172554;
+    font-size: 20px;
+    margin: 0;
+}
+
 .section-heading button {
     background: #2563eb;
-    color: white;
+    color: #ffffff;
     border: none;
     padding: 10px 18px;
     border-radius: 8px;
     cursor: pointer;
+    font-weight: 600;
 }
 
 .table-wrapper {
     overflow-x: auto;
+    width: 100%;
 }
 
 table {
@@ -103,6 +137,7 @@ table {
     border-collapse: collapse;
     margin-top: 20px;
     min-width: 650px;
+    background: #ffffff;
 }
 
 th,
@@ -115,12 +150,28 @@ td {
 th {
     color: #64748b;
     background: #f8fafc;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+td {
+    color: #334155;
+    font-size: 14px;
+    background: #ffffff;
+}
+
+tbody tr:hover td {
+    background-color: #f8fafc;
 }
 
 .status {
     padding: 6px 12px;
     border-radius: 20px;
     font-size: 12px;
+    font-weight: 600;
+    display: inline-block;
 }
 
 .delivered {
